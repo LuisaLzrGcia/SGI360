@@ -1,0 +1,44 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
+#root {
+  padding: 0px;
+  margin: 0px;
+}
+
+.bg-base {
+  background-color: #1f2937;
+}
+
+input:focus {
+  outline: none;
+}
+
+.bg-transparent {
+  background-color: rgba(249, 250, 251, 0.7);
+}
+
+option {
+  color: black; /* Establece el color del texto en negro */
+  background-color: white; /* Establece el fondo en blanco */
+}
