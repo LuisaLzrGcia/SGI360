@@ -3,8 +3,8 @@ import Sidebar from '../Sidebar/Sidebar'
 import Navbar from '../Navbar/Navbar'
 import DashboardGral from '../Dashboards/DashboardGral'
 import Tables from '../Tables/Tables'
-import { SGIContext } from '../../Context/ContextGlobal'
-import TableUsers from '../../View/TableUsers/TableUsers'
+import { SGIContext } from '../../Context/SGIContext'
+import ManagerView from '../../View/TableManagers/ManagerView'
 
 function LayoutMain() {
     const { selectedComponent } = useContext(SGIContext);
@@ -15,7 +15,7 @@ function LayoutMain() {
             case 'tables':
                 return <Tables />;
             case 'users':
-                return <TableUsers/>;
+                return <ManagerView/>;
             default:
                 return null;
         }
@@ -26,12 +26,12 @@ function LayoutMain() {
                 <div className='z-50 col-span-1'>
                     <Sidebar />
                 </div>
-                <div className='z-1 col-span-6 overflow-y-scroll'>
+                <div className='z-1 col-span-6 overflow-y-scroll bottom-0'>
                     <div className='z-20 sticky right-0 left-0 top-0'>
                         <Navbar />
                     </div>
-                    <div className=''>
-                        <div className='h-52'>
+                    <div className=' mb-1'>
+                        <div className=''>
                             {renderSelectedComponent()}
                         </div>
                     </div>

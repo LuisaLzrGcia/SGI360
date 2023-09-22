@@ -1,9 +1,7 @@
 import { useContext, useState } from "react";
-import { SGIContext } from "../Context/ContextGlobal";
 
 function useAuth() {
   const [isAuth, setIsAuth] = useState(false);
-  const { isLoged, setIsLoged } = useContext(SGIContext);
 
   const getAuth = (data) => {
     sessionStorage.setItem("id_user", data.id_user);

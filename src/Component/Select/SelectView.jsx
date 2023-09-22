@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-function SelectView({ select, selectValue, valores, }) {
+function SelectView({ select = "", selectValue = "", valores }) {
     const [selectedValue, setSelectedValue] = useState(select);
 
     const handleChange = (event) => {
@@ -16,7 +16,7 @@ function SelectView({ select, selectValue, valores, }) {
             <select
                 defaultValue={select}
                 onChange={handleChange}
-                className="border p-1 rounded-md text-black capitalize  bg-gray-50"
+                className="w-full border p-1 rounded-md text-black capitalize  bg-gray-50"
             >
                 {valores.map((item, index) => (
                     <option

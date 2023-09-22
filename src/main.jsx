@@ -7,7 +7,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Sidebar from './Layout/Sidebar/Sidebar.jsx'
 import LayoutMain from './Layout/LayoutMain/LayoutMain.jsx'
 import Example from './Layout/Sidebar/prueba.jsx'
-import { SGIContextProvider } from "./Context/ContextGlobal.jsx";
+import { SGIContextProvider } from './Context/SGIContext.jsx'
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(

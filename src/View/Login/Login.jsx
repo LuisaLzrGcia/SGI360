@@ -3,12 +3,11 @@ import LoginView from './LoginView'
 import FooterView from '../../Layout/Footer/FooterView'
 import jwtDecode from 'jwt-decode'
 import useSWR from '../../Hooks/getData'
-import { SGIContext } from '../../Context/ContextGlobal'
 import useAuth from '../../Hooks/useAuth'
+import { SGIContext } from '../../Context/SGIContext'
 const API_SGI360 = import.meta.env.VITE_API_DATABASE;
 
 function Login() {
-    const { isLoged, setIsLoged } = useContext(SGIContext);
     const {isAuth, getAuth,} = useAuth();
 
     const [found, setFound] = useState(false)
