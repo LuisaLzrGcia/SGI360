@@ -1,111 +1,133 @@
 import React, { useEffect, useState } from 'react';
 import getData from '../../../Hooks/getData';
 import { Table } from '@tremor/react';
+import PaginationView from '../../../Component/Pagination/PaginationView';
+import ModalView from '../../../Component/Modal/ModalView';
+import ModifyProcess from './ModifyProcess';
+import NewProcess from './NewProcess';
+import DeleteProcess from './DeleteProcess';
 
 const API_SGI360 = import.meta.env.VITE_API_DATABASE;
 
 async function fetchData() {
   try {
-    const allUser = await getData(`${API_SGI360}/admin/allProcess.php`);
+    const allUser = await getData(`${API_SGI360}/admin/Process/allProcess.php`);
     return allUser;
   } catch (error) {
     console.error("Error al obtener los datos:", error);
     return [];
   }
 }
+const processLength = await getData(`${API_SGI360}/admin/Process/processLength.php`);
+const url = `${API_SGI360}/admin/Process/allProcess.php?page=`
 
 export default function TableProcessView() {
+
+  const [pageCurrent, setPageCurrent] = useState(1)
+  const processPageCurrent = async () => {
+    const processPageCurrent = await getData(url + pageCurrent);
+    console.log(processPageCurrent)
+    return processPageCurrent;
+  }
+
   const [dataProcess, setDataProcess] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // Cantidad de elementos por página
+  const [currentItems, setCurrentItems] = useState(dataProcess.slice(0, 10));
+  const [isOpen, setIsOpen] = useState(false);
+  const [componet, setComponet] = useState("");
+  const [action, setAction] = useState("new");
+  const [length, setLength] = useState(processLength)
+
+
+  const closeModal = () => setIsOpen(false);
+  const openModal = () => setIsOpen(true);
+
+  const handleNew = () => {
+    console.log("first")
+    setAction('new');
+    const newProcessComponent = <NewProcess setData={setDataProcess} closeModal={closeModal} updateData={updateData} />;
+    setComponet(newProcessComponent);
+    openModal();
+  }
+
+  const handleModify = ({ item }) => {
+    setAction('modify');
+    const updateProcessComponent = <ModifyProcess data={item} setData={updateData} closeModal={closeModal} url={url} />;
+    setComponet(updateProcessComponent);
+    openModal();
+  }
+
+  const handleDelete = ({ item }) => {
+    setAction('delete');
+    const updateComponent = <DeleteProcess data={item} updateData={updateData} closeModal={closeModal} />;
+    setComponet(updateComponent);
+    openModal();
+  }
+
+  const updateData = async () => {
+    const allProcess = await getData(url + pageCurrent);
+    setCurrentItems(allProcess)
+    const processLength = await getData(`${API_SGI360}/admin/Process/processLength.php`);
+    setLength(processLength)
+  }
 
   useEffect(() => {
     async function fetchDataAsync() {
       const allProcessData = await fetchData();
       setDataProcess(allProcessData);
+      setCurrentItems(allProcessData.slice(0, 10));
     }
     fetchDataAsync();
   }, []);
 
-  const totalPages = Math.ceil(dataProcess.length / itemsPerPage);
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = dataProcess.slice(indexOfFirstItem, indexOfLastItem);
-
-  // Función para cambiar de página
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
-  const handleBack = () => {
-    if (currentPage === 1) {
-      setCurrentPage(totalPages);
-    } else {
-      setCurrentPage(currentPage - 1);
-    }
+  const handleRefresh = async () => {
+    const allProcessData = await fetchData();
+    setDataProcess(allProcessData);
   }
-
-  const handleNext = () => {
-    if (currentPage === totalPages) {
-      setCurrentPage(1);
-    } else {
-      setCurrentPage(currentPage + 1);
-    }
-  }
-
-
-  const handleModify = (item) => {
-    // Implementa tu lógica para modificar un elemento aquí
-  };
-
-  const handleDelete = (item) => {
-    // Implementa tu lógica para eliminar un elemento aquí
-  };
-
   return (
     <>
+      {
+        (() => {
+          switch (action) {
+            case 'new':
+              return (
+                <ModalView openModal={openModal} closeModal={closeModal} isOpen={isOpen} componentReact={componet} title={"Registrar nuevo proceso"} />
+              );
+            case 'modify':
+              return (
+                <ModalView openModal={openModal} closeModal={closeModal} isOpen={isOpen} componentReact={componet} title={"Modificar proceso"} />
+              );
+            case 'delete':
+              return (
+                <ModalView openModal={openModal} closeModal={closeModal} isOpen={isOpen} componentReact={componet} title={"Eliminar proceso"} />
+              );
+            default:
+              return null;
+          }
+        })
+      }
       <div className="pb-5 flex items-center justify-between">
-        <div className='bg-red-300 flex items-center justify-start w-1/6'>
-          <button className="rounded-md bg-slate-700 p-2 text-white text-sm">
+        <div className='flex items-center justify-start w-1/6'>
+          <button
+            onClick={handleNew}
+            className="rounded-md bg-slate-700 p-2 text-white text-sm">
             Añadir proceso
           </button>
         </div>
-        <div className='bg-yellow-300 flex items-center justify-center w-4/6'>
-          <div
-            className="flex justify-center">
-            <ul className="flex">
-              <button
-                onClick={handleBack}
-                className='rounded-l-lg bg-gray-300 hover:bg-slate-500 hover:text-white'>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                </svg>
-              </button>
-              {Array.from({ length: totalPages }).map((_, index) => (
-                <li key={index}>
-                  <button
-                    onClick={() => handlePageChange(index + 1)}
-                    className={`px-3 py-2 ${currentPage === index + 1
-                      ? 'bg-slate-700 text-white'
-                      : 'bg-gray-300 hover:bg-slate-500 hover:text-white'
-                      }`}
-                  >
-                    {index + 1}
-                  </button>
-                </li>
-              ))}
-              <button
-                onClick={handleNext}
-                className='rounded-r-lg bg-gray-300 hover:bg-slate-500 hover:text-white'>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                </svg>
-              </button>
-            </ul>
-          </div>
+        <div className='flex items-center justify-center w-4/6'>
+          {
+            <PaginationView
+              items={dataProcess}
+              setCurrentItems={setCurrentItems}
+              length={length}
+              url={url}
+              setPageCurrent={setPageCurrent}
+            />
+          }
         </div>
-        <div className='bg-blue-300 flex items-center justify-end w-1/6'>
-          <button className="ml-3 rounded-md bg-slate-700 p-2 text-white text-sm flex items-center justify-center">
+        <div className='flex items-center justify-end w-1/6'>
+          <button
+            onClick={handleRefresh}
+            className="ml-3 rounded-md bg-slate-700 p-2 text-white text-sm flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
             </svg>
@@ -165,7 +187,6 @@ export default function TableProcessView() {
           ))}
         </tbody>
       </Table>
-
     </>
   );
 }

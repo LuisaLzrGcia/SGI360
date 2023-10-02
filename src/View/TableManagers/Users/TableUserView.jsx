@@ -8,6 +8,7 @@ import ModifyUser from "./ModifyUser";
 import NewUser from "./NewUser";
 import getData from "../../../Hooks/getData";
 import DeleteUser from "./DeleteUser";
+import PaginationView from "../../../Component/Pagination/PaginationView";
 const API_SGI360 = import.meta.env.VITE_API_DATABASE;
 
 async function fetchData() {
@@ -25,6 +26,7 @@ function TableUserView() {
     const [isOpen, setIsOpen] = useState(false);
     const [componet, setComponet] = useState("");
     const [action, setAction] = useState("new");
+    const [currentItems, setCurrentItems] = useState([]); // Inicializa con un array vacío o un valor predeterminado
 
     const closeModal = () => setIsOpen(false);
     const openModal = () => setIsOpen(true);
@@ -33,13 +35,13 @@ function TableUserView() {
         async function fetchDataAsync() {
             const allUserData = await fetchData();
             setDataUsers(allUserData);
+            setCurrentItems(dataUsers.slice(0, 10)); // Actualiza currentItems con los datos recuperados
         }
         fetchDataAsync();
     }, []);
-
     const handleNew = () => {
         setAction('new');
-        const newUserComponent = <NewUser setDataUsers={setDataUsers} closeModal={closeModal} />;
+        const newUserComponent = <NewUser setDataUsers={setDataUsers} dataUsers={dataUsers} closeModal={closeModal} handleRefresh={handleRefresh} />;
         setComponet(newUserComponent);
         openModal();
     }
@@ -62,6 +64,20 @@ function TableUserView() {
         const allUserData = await fetchData();
         setDataUsers(allUserData);
     }
+
+    useEffect(() => {
+        async function fetchDataAsync() {
+            try {
+                const allUserData = await fetchData();
+                setDataUsers(allUserData);
+                setCurrentItems(allUserData.slice(0, 10));
+            } catch (error) {
+                console.error("Error al obtener los datos:", error);
+            }
+        }
+        fetchDataAsync();
+    }, []);
+    
 
     return (
         <>
@@ -91,6 +107,13 @@ function TableUserView() {
                 <button onClick={handleNew} className="rounded-md bg-slate-700 p-2 text-white text-sm">
                     Añadir usuario
                 </button>
+                <div className='flex items-center justify-center w-4/6'>
+                    {
+                        dataUsers.length < 11
+                            ? null
+                            : <PaginationView items={dataUsers} setCurrentItems={setCurrentItems} />
+                    }
+                </div>
                 <button onClick={handleRefresh} className="ml-3 rounded-md bg-slate-700 p-2 text-white text-sm flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />

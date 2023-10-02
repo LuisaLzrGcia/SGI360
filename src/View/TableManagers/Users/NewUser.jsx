@@ -5,7 +5,7 @@ import getData from "../../../Hooks/getData";
 import { SGIContext } from "../../../Context/SGIContext";
 const API_SGI360 = import.meta.env.VITE_API_DATABASE;
 
-function NewUser({ setDataUsers, closeModal }) {
+function NewUser({ setDataUsers = "",dataUsers, closeModal, handleRefresh }) {
   const [usernameInput, setUsernameInput] = useState("");
   const [firstNameInput, setFirstNameInput] = useState("");
   const [lastNameInput, setLastNameInput] = useState("");
@@ -14,31 +14,43 @@ function NewUser({ setDataUsers, closeModal }) {
   const [typeUserInput, setTypeUserInput] = useState("manager");
   const [samePassword, setSamePassword] = useState(true)
 
-  const { insertDataUser } = useContext(SGIContext);
 
-  const [isLoading, setIsLoading] = useState(false);
+  function saveData() {
+    const URL = `${API_SGI360}/admin/insertUser.php`;
+    const typeUserNum = typeUserInput === 'admin' ? 1 : 2;
+    const data = {
+      newUsername: usernameInput,
+      newFirstName: firstNameInput,
+      newLastName: lastNameInput,
+      newPassword: passwordInput,
+      newTypeUser: typeUserNum,
+    };
+    console.log(typeUserInput)
 
-  const saveData = async () => {
-    setIsLoading(true); // Deshabilita el botón
-
-    try {
-      const saveUser = await insertDataUser(usernameInput, passwordInput, firstNameInput, lastNameInput, typeUserInput);
-
-      if (saveUser === 'Successfully') {
-        setDataUsers(await getData(`${API_SGI360}/admin/allUsers.php`));
-        alert("Datos guardados");
-        closeModal();
-      } else {
-        alert("Error al intentar guardar los datos");
-      }
-    } catch (error) {
-      console.error(error);
-      alert("Error al intentar guardar los datos");
-    } finally {
-      setIsLoading(false); // Habilita el botón nuevamente
-    }
-  };
-
+    fetch(URL, {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+      .then(response => response.json())
+      .then(result => {
+        if (result.status === 'Successfully') {
+          alert("Datos guardados");
+          setDataUsers(`${API_SGI360}/admin/allusers.php`)
+          handleRefresh()
+          closeModal();
+        } else {
+          console.log('Error al insertar');
+        }
+        alert(result.status);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error al intentar guardar los datos');
+      });
+  }
 
   useEffect(() => {
     if (passwordInput == confirmPasswordInput) {
@@ -96,7 +108,7 @@ function NewUser({ setDataUsers, closeModal }) {
           onClick={saveData}
           className={`rounded-md p-2 text-white text-sm  ${!samePassword ? 'bg-slate-500' : 'bg-slate-700 mt-1'
             }`}
-          disabled={!samePassword || isLoading} // Deshabilita el botón si isLoading es true
+          disabled={!samePassword || passwordInput == '' || confirmPasswordInput == ''} // Deshabilita el botón si isLoading es true
         >
           Guardar datos
         </button>

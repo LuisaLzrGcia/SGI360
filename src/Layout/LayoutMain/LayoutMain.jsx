@@ -5,6 +5,7 @@ import DashboardGral from '../Dashboards/DashboardGral'
 import Tables from '../Tables/Tables'
 import { SGIContext } from '../../Context/SGIContext'
 import ManagerView from '../../View/TableManagers/ManagerView'
+import TableDocumentsView from '../../View/TableDocuments/TableDocumentsView'
 
 function LayoutMain() {
     const { selectedComponent } = useContext(SGIContext);
@@ -12,10 +13,10 @@ function LayoutMain() {
         switch (selectedComponent) {
             case 'dashboard':
                 return <DashboardGral />;
-            case 'tables':
-                return <Tables />;
             case 'users':
-                return <ManagerView/>;
+                return <ManagerView />;
+            case 'documents':
+                return <TableDocumentsView/>
             default:
                 return null;
         }

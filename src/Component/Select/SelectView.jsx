@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-function SelectView({ select = "", selectValue = "", valores }) {
+export default function SelectView({ select = "", selectValue = "", valores }) {
     const [selectedValue, setSelectedValue] = useState(select);
 
     const handleChange = (event) => {
@@ -31,5 +31,3 @@ function SelectView({ select = "", selectValue = "", valores }) {
         </>
     );
 }
-
-export default SelectView;

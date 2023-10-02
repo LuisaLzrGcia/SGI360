@@ -4,14 +4,13 @@ import {
     Button,
 } from "@tremor/react";
 import React, { Fragment } from "react";
-import { Card, Flex, Text, TextInput, BarList } from "@tremor/react";
 import { Dialog, Transition } from "@headlessui/react";
-function ModalView({ closeModal, isOpen, componentReact, title }) {
+function ModalView({ closeModal, isOpen, componentReact, title, sizeModal = "" }) {
 
     return (
         <>
             <Transition appear show={isOpen} as={Fragment}>
-                <Dialog as="div" className="relative z-50" onClose={closeModal}>
+                <Dialog as="div" className="relative z-40" onClose={closeModal}>
                     <Transition.Child
                         as={Fragment}
                         enter="ease-out duration-300"
@@ -35,8 +34,8 @@ function ModalView({ closeModal, isOpen, componentReact, title }) {
                                 leaveTo="opacity-0 scale-95"
                             >
                                 <Dialog.Panel
-                                    className="w-1/3 max-w-xl transform overflow-hidden ring-tremor bg-white
-                                    p-6 text-left align-middle shadow-tremor transition-all rounded-xl"
+                                    className={`${sizeModal == "" ? "w-1/3" : sizeModal
+                                        } max-w-xl transform overflow-hidden ring-tremor bg-white p-6 text-left align-middle shadow-tremor transition-all rounded-xl`}
                                 >
                                     <div className="flex items-center justify-between">
                                         <div className="w-full flex justify-center items-center uppercase text-lg">

@@ -1,7 +1,5 @@
 import {
     Card,
-    Flex,
-    Text,
     TabList,
     Tab,
     TabGroup,
