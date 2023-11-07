@@ -1,27 +1,30 @@
 import React, { useContext, useEffect, useState } from 'react'
 import LoginView from './LoginView'
 import FooterView from '../../Layout/Footer/FooterView'
-import jwtDecode from 'jwt-decode'
-import useSWR from '../../Hooks/getData'
+
 import useAuth from '../../Hooks/useAuth'
 import { SGIContext } from '../../Context/SGIContext'
+import getData from '../../Hooks/getData'
 const API_SGI360 = import.meta.env.VITE_API_DATABASE;
 
 function Login() {
-    const {isAuth, getAuth,} = useAuth();
+    const { isAuth, getAuth, } = useAuth();
 
     const [found, setFound] = useState(false)
 
     const handledLoginSubmit = async (e) => {
         e.preventDefault()
-        console.log("handledLoginSubmit")
         const form = new FormData(e.target)
         const formData = Object.fromEntries(form)
         const { username, password } = formData;
         const data = await loginUser(username, password);
-        if (data != null) {
+        if (data.id_user_pk>0) {
             getAuth(data)
-            window.location="/admin"
+            if(sessionStorage.getItem("type")=="Admin"){
+                window.location = "/admin"
+            }else{
+                window.location = "/manager"
+            } 
         } else {
             setFound(true)
         }
@@ -40,7 +43,6 @@ function Login() {
                     password: passwordForm
                 })
             });
-
             if (!response.ok) {
                 throw new Error('Error en la petición');
             }

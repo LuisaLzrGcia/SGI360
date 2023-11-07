@@ -5,12 +5,12 @@ import {
 } from "@tremor/react";
 import React, { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-function ModalView({ closeModal, isOpen, componentReact, title, sizeModal = "" }) {
-
+function ModalView({ closeModal, isOpen, componentReact, title, sizeModal = "", sizeModalMax =""}) {
     return (
         <>
+        
             <Transition appear show={isOpen} as={Fragment}>
-                <Dialog as="div" className="relative z-40" onClose={closeModal}>
+                <Dialog as="div" className="relative z-40 " onClose={closeModal}>
                     <Transition.Child
                         as={Fragment}
                         enter="ease-out duration-300"
@@ -20,7 +20,7 @@ function ModalView({ closeModal, isOpen, componentReact, title, sizeModal = "" }
                         leaveFrom="opacity-100"
                         leaveTo="opacity-0"
                     >
-                        <div className="fixed inset-0 bg-gray-900 bg-opacity-25" />
+                        <div className="fixed inset-0 bg-gray-900 bg-opacity-25 "  />
                     </Transition.Child>
                     <div className="fixed inset-0 overflow-y-auto">
                         <div className="flex min-h-full items-center justify-center p-4 text-center">
@@ -34,8 +34,8 @@ function ModalView({ closeModal, isOpen, componentReact, title, sizeModal = "" }
                                 leaveTo="opacity-0 scale-95"
                             >
                                 <Dialog.Panel
-                                    className={`${sizeModal == "" ? "w-1/3" : sizeModal
-                                        } max-w-xl transform overflow-hidden ring-tremor bg-white p-6 text-left align-middle shadow-tremor transition-all rounded-xl`}
+                                      className={`${sizeModal == "" ? "w-1/3" : sizeModal} ${sizeModalMax == "" ? "max-w-xl" : sizeModalMax}  h-2/3 transform overflow-hidden ring-tremor bg-white p-6 text-left align-middle shadow-tremor transition-all rounded-xl`}
+
                                 >
                                     <div className="flex items-center justify-between">
                                         <div className="w-full flex justify-center items-center uppercase text-lg">

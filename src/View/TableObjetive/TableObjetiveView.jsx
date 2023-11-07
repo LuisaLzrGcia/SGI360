@@ -6,31 +6,32 @@ import {
     TabPanels,
     TabPanel,
 } from "@tremor/react";
-import { UserIcon, BriefcaseIcon, OfficeBuildingIcon, UserGroupIcon } from "@heroicons/react/solid";
-import TableUserView from "./Users/TableUserView";
-import TableProcessView from "./Process/TableProcessView";
-function ManagerView() {
+import { BadgeCheckIcon, ViewListIcon, OfficeBuildingIcon, UserGroupIcon } from "@heroicons/react/solid";
+import TableAchievementView from "./Achievement/TableAchievementView";
+import TableObjetiveListView from "./Objetives/TableObjetiveListView";
+
+function TableObjetiveView() {
     return (
         <>
             <div className="mx-3 mb-10">
                 <TabGroup>
                     <TabList className="mt-3">
-                        <Tab className="text-lg" icon={UserIcon}>
-                            Usuarios
+                        <Tab className="text-lg" icon={BadgeCheckIcon}>
+                            Cumplimiento
                         </Tab>
-                        <Tab className="text-lg" icon={OfficeBuildingIcon}>
-                            Procesos
+                        <Tab className="text-lg" icon={ViewListIcon}>
+                            Objetivos
                         </Tab>
                     </TabList>
                     <TabPanels>
                         <TabPanel className="">
                             <Card>
-                                <TableUserView />
+                                <TableAchievementView/>
                             </Card>
                         </TabPanel>
                         <TabPanel>
                             <Card>
-                                <TableProcessView />
+                                <TableObjetiveListView/>
                             </Card>
                         </TabPanel>
                     </TabPanels>
@@ -40,4 +41,4 @@ function ManagerView() {
     )
 }
 
-export default ManagerView
+export default TableObjetiveView

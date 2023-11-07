@@ -5,7 +5,8 @@ const API_SGI360 = import.meta.env.VITE_API_DATABASE;
 
 const DeleteUser = ({ data = "", setDataUsers, closeModal }) => {
   const { deleteDataUser } = useContext(SGIContext);
-  const { id, username, firstName, lastName, password, typeUser } = data;
+  console.log(data)
+  const { id, username, firstName, lastName, password, process, jobTitle, type } = data;
 
   const handleDelete = async (id) => {
     const statusDelete = await deleteDataUser(id);
@@ -41,7 +42,17 @@ const DeleteUser = ({ data = "", setDataUsers, closeModal }) => {
           className="px-2 py-1 border rounded-md bg-gray-50" />
         <div>Tipo de usuario</div>
         <input
-          value={typeUser}
+          value={type}
+          disabled="false"
+          className="px-2 py-1 border rounded-md bg-gray-50 capitalize" />
+          <div>Puesto</div>
+        <input
+          value={jobTitle}
+          disabled="false"
+          className="px-2 py-1 border rounded-md bg-gray-50 capitalize" />
+          <div>Proceso</div>
+        <input
+          value={process}
           disabled="false"
           className="px-2 py-1 border rounded-md bg-gray-50 capitalize" />
         <div>Contraseña</div>

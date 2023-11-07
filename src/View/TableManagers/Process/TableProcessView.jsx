@@ -18,7 +18,17 @@ async function fetchData() {
     return [];
   }
 }
-const processLength = await getData(`${API_SGI360}/admin/Process/processLength.php`);
+async function fetchDataLenght() {
+  try {
+    const processLength = await getData(`${API_SGI360}/admin/Process/processLength.php`);
+    // Aquí continúas con el código si la llamada fue exitosa
+    return processLength
+  } catch (error) {
+    // Aquí manejas el error
+    console.error("Error al obtener datos:", error);
+  }
+}
+
 const url = `${API_SGI360}/admin/Process/allProcess.php?page=`
 
 export default function TableProcessView() {
@@ -39,19 +49,18 @@ export default function TableProcessView() {
 
 
   const closeModal = () => setIsOpen(false);
-  const openModal = () => setIsOpen(true);
+  const openModal = () => { setIsOpen(true) };
 
   const handleNew = () => {
-    console.log("first")
     setAction('new');
-    const newProcessComponent = <NewProcess setData={setDataProcess} closeModal={closeModal} updateData={updateData} />;
+    const newProcessComponent = <NewProcess setData={setDataProcess} closeModal={closeModal} updateData={updateData}/>;
     setComponet(newProcessComponent);
     openModal();
   }
 
   const handleModify = ({ item }) => {
     setAction('modify');
-    const updateProcessComponent = <ModifyProcess data={item} setData={updateData} closeModal={closeModal} url={url} />;
+    const updateProcessComponent = <ModifyProcess data={item} setData={updateData} closeModal={closeModal} />;
     setComponet(updateProcessComponent);
     openModal();
   }
@@ -69,6 +78,7 @@ export default function TableProcessView() {
     const processLength = await getData(`${API_SGI360}/admin/Process/processLength.php`);
     setLength(processLength)
   }
+
 
   useEffect(() => {
     async function fetchDataAsync() {
@@ -103,7 +113,7 @@ export default function TableProcessView() {
             default:
               return null;
           }
-        })
+        })()
       }
       <div className="pb-5 flex items-center justify-between">
         <div className='flex items-center justify-start w-1/6'>
@@ -114,7 +124,7 @@ export default function TableProcessView() {
           </button>
         </div>
         <div className='flex items-center justify-center w-4/6'>
-          {
+        {
             <PaginationView
               items={dataProcess}
               setCurrentItems={setCurrentItems}
@@ -123,6 +133,7 @@ export default function TableProcessView() {
               setPageCurrent={setPageCurrent}
             />
           }
+
         </div>
         <div className='flex items-center justify-end w-1/6'>
           <button
@@ -153,7 +164,7 @@ export default function TableProcessView() {
         </thead>
         <tbody className="text-md text-black">
           {currentItems.map((item, index) => (
-            <tr className="border-t border-slate-400" key={index}>
+            <tr className={`border-t border-slate-400 ${index % 2 == 0 ? 'bg-slate-100' : ''}`} key={index}>
               <td className="">
                 <div className="flex item-center justify-center">
                   {item.name}

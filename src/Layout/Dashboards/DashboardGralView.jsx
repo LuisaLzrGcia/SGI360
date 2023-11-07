@@ -114,61 +114,11 @@ function DashboardGralView() {
 
     return (
         <>
-            <div className="mx-3 mb-5">
-                <TabGroup>
-                    <TabList className="mt-3">
-                        <Tab icon={UserGroupIcon}>
-                            Todos los procesos</Tab>
-                        <Tab icon={UserIcon}>Sistemas de Gestión</Tab>
-                        <Tab icon={UserIcon}>SyMA</Tab>
-                    </TabList>
-                    <TabPanels>
-                        <TabPanel >
-                            <div className="m-5">
-                                <Card>
-                                    <Title>Desempeño de todos los procesos | Agosto 2023</Title>
-                                    <BarChartView data={chartdata} />
-                                </Card>
-                            </div>
-                            <div className="grid grid-cols-2 gap-5 mx-5">
-                                <div>
-                                    <Objetivos />
-                                </div>
-                                <div>
-                                    <CtrlDocumental />
-                                </div>
-                                <Card className="col-span-2">
-                                    <AccionesCorrec />
-                                </Card>
-                            </div>
-                        </TabPanel>
-                        <TabPanel>
-                            <div className="mt-10">
-                                <Flex className="mt-4">
-                                    <Text className="w-full">Product Z</Text>
-                                    <Flex className="space-x-2" justifyContent="end">
-                                        <Text>$ 99,484</Text>
-                                        <Text>16%</Text>
-                                    </Flex>
-                                </Flex>
-                                <ProgressBar value={12} className="mt-2" />
-                            </div>
-                        </TabPanel>
-                        <TabPanel>
-                            <div className="mt-10">
-                                <Flex className="mt-4">
-                                    <Text className="w-full">Product Z</Text>
-                                    <Flex className="space-x-2" justifyContent="end">
-                                        <Text>$ 9,484</Text>
-                                        <Text>6%</Text>
-                                    </Flex>
-                                </Flex>
-                                <ProgressBar value={6} className="mt-2" />
-                            </div>
-                        </TabPanel>
-                    </TabPanels>
-                </TabGroup>
-            </div>
+            <div className="mx-1 mb-5">
+                <div className="grid grid-cols-2 gap-5 mx-5">
+                <iframe title="Control documental" width="1140" height="541.25" src="https://app.powerbi.com/reportEmbed?reportId=9c472e76-732a-401a-8366-0bee2a752a7e&autoAuth=true&ctid=fad75a54-a323-4cd0-8e51-6a8d57035aa8" frameborder="0" allowFullScreen="true"></iframe>
+                </div>
+            </div >
         </>
     )
 }

@@ -7,36 +7,49 @@ import { DatePicker } from "@tremor/react";
 import DatePickerView from "../../Component/DatePicker/DatePickerView";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-function NewDocument({ processes, closeModal, handleRefresh = () => { } }) {
-  const [arrayProcess, setArrayProcess] = useState(processes)
+
+async function fetchDataProcess() {
+  try {
+    const data = await getData(`${API_SGI360}/admin/Process/nameProcess.php`);
+    return data
+  } catch (error) {
+    console.error("Error al obtener los datos:", error);
+    return [];
+  }
+}
+
+function ModifyDocument({ data, processes, refresh, closeModal }) {
   const processName = processes.map(item => item.name);
   processName.sort((a, b) => a.localeCompare(b));
-  const [nameProcess, setNameProcess] = useState(processName)
-  const [typeInput, setTypeInput] = useState("Instructivo")
-  const [processInput, setProcessInput] = useState("")
-  const [codeInput, setCodeInput] = useState("")
-  const [titleInput, setTitleInput] = useState("")
-  const [reviewerInput, setReviewerInput] = useState("")
-  const [autorizerInput, setAutorizerInput] = useState("")
-  const [issuanceDateInput, setIssuanceDateInput] = useState("")
-  const [daysInput, setDaysInput] = useState(1096)
+  const [idDocument, setIdDocument] = useState(data.id)
+  const [nameProcesses, setNameProcesses] = useState(processName)
+  const [typeInput, setTypeInput] = useState(data.type)
+  const [processInput, setProcessInput] = useState(data.process)
+  const [codeInput, setCodeInput] = useState(data.code)
+  const [titleInput, setTitleInput] = useState(data.title)
+  const [reviewerInput, setReviewerInput] = useState(data.reviewer)
+  const [autorizerInput, setAutorizerInput] = useState(data.autorizer)
+  const fechaString = data.issuance_date;
+  const partesFecha = fechaString.split("-");
+  const fechaObjeto = new Date(`${partesFecha[2]}-${partesFecha[1]}-${parseInt(partesFecha[0]) + 1}`);
+  const [issuanceDateInput, setIssuanceDateInput] = useState(fechaObjeto)
+  const [daysInput, setDaysInput] = useState(data.days)
 
   function saveData() {
-    const processFind = arrayProcess.find(item => item.name === processInput)
+    const processFind = processes.find(item => item.name === processInput)
     const fechaFormateada = format(issuanceDateInput, "yyyy-MM-dd");
-    const URL = `${API_SGI360}/admin/Documents/insertDocument.php`;
+    const URL = `${API_SGI360}/admin/Documents/updateDocument.php`;
     const data = {
+      id: idDocument,
       newType: typeInput,
       newCode: codeInput,
       newTitle: titleInput,
       newReviewer: reviewerInput,
       newAutorizer: autorizerInput,
       newIssuanceDate: fechaFormateada,
-      newDays: daysInput,
+      newDays: parseInt(daysInput),
       newProcess: parseInt(processFind.id)
     };
-    console.log(URL)
-
     fetch(URL, {
       method: 'POST',
       headers: {
@@ -46,10 +59,10 @@ function NewDocument({ processes, closeModal, handleRefresh = () => { } }) {
     })
       .then(response => response.json())
       .then(result => {
-        if (result.status === 'Successfully') {
+        if (result.status == 'Successfully') {
           alert("Datos guardados");
-          handleRefresh();
           closeModal();
+          refresh()
         } else {
           console.log('Error al insertar');
         }
@@ -80,17 +93,18 @@ function NewDocument({ processes, closeModal, handleRefresh = () => { } }) {
               placeholder="Seleccione un proceso"
               select={processInput}
               setSelectValue={setProcessInput}
-              valores={nameProcess}
+              valores={nameProcesses}
             />
           </div>
         </div>
         <div className="grid grid-cols-3 mb-2">
           <div>Fecha de emisión</div>
           <DatePicker
-            locale={es}
             className="col-span-2"
             placeholder="Selecione un fecha de emisión"
             onValueChange={setIssuanceDateInput}
+            locale={es}
+            value={issuanceDateInput}
           />
         </div>
         <div className="grid grid-cols-3 mb-2">
@@ -134,7 +148,7 @@ function NewDocument({ processes, closeModal, handleRefresh = () => { } }) {
           <input
             value={daysInput}
             onChange={(event) => setDaysInput(event.target.value)}
-            type="number"
+            type="text"
             className="px-2 py-1 border rounded-md bg-gray-50 col-span-2"
           />
         </div>
@@ -149,4 +163,4 @@ function NewDocument({ processes, closeModal, handleRefresh = () => { } }) {
   );
 }
 
-export default NewDocument;
+export default ModifyDocument;

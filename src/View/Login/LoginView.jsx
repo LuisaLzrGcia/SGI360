@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import Logo from '../../assets/enterprise-logo.png';
+import Logo from '../../assets/logo.png';
 import Alert from '../../Component/Alert/Alert';
 
 function LoginView({ handledLoginSubmit, found, setFound }) {
@@ -16,9 +16,9 @@ function LoginView({ handledLoginSubmit, found, setFound }) {
     return (
 
         <>
-            <div className='flex justify-center items-center'>
-                <div className='grid grid-cols-2 gap-4 divide-x divide-gray-300 w-2/3 shadow-2xl rounded-xl p-3'>
-                    <div className=''>
+            <div className='flex justify-center items-center w-screen h-full'>
+                <div className='grid grid-cols-2 gap-4 divide-x divide-gray-300 shadow-2xl rounded-xl p-3'>
+                    <div className='flex justify-center items-center'>
                         <img className='w-auto h-auto' alt="" srcSet={Logo} />
                     </div>
                     <div className="flex p-5 w-auto justify-center flex-col items-center">
@@ -30,10 +30,12 @@ function LoginView({ handledLoginSubmit, found, setFound }) {
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                                     </svg>
                                     <input
-                                    onChangeCapture={()=>setFound(false)}
+                                        onChangeCapture={() => setFound(false)}
                                         name="username"
                                         placeholder="Usuario"
+                                        className='bg-white'
                                     />
+
                                 </div>
                                 <div className="relative">
                                     <div className='w-[300px] p-2 rounded-md shadow-md bg-white flex content-center border'>
@@ -42,7 +44,7 @@ function LoginView({ handledLoginSubmit, found, setFound }) {
                                         </svg>
 
                                         <input
-                                        onChangeCapture={()=>setFound(false)}
+                                            onChangeCapture={() => setFound(false)}
                                             type={showPassword ? 'text' : 'password'}
                                             name="password"
                                             placeholder="Contraseña"

@@ -20,6 +20,15 @@ async function fetchData() {
         return [];
     }
 }
+async function fetchDataProcess() {
+    try {
+        const data = await getData(`${API_SGI360}/admin/Process/nameProcess.php`);
+        return data
+    } catch (error) {
+        console.error("Error al obtener los datos:", error);
+        return [];
+    }
+}
 
 function TableUserView() {
     const [dataUsers, setDataUsers] = useState([]);
@@ -31,6 +40,10 @@ function TableUserView() {
     const closeModal = () => setIsOpen(false);
     const openModal = () => setIsOpen(true);
 
+    const processes = async () => {
+        const allData = await fetchDataProcess();
+        return allData;
+    }
     useEffect(() => {
         async function fetchDataAsync() {
             const allUserData = await fetchData();
@@ -39,18 +52,33 @@ function TableUserView() {
         }
         fetchDataAsync();
     }, []);
-    const handleNew = () => {
+
+    const setData = async () => {
+        const allUserData = await fetchData();
+        setDataUsers(allUserData);
+    }
+    const handleNew = async () => {
         setAction('new');
-        const newUserComponent = <NewUser setDataUsers={setDataUsers} dataUsers={dataUsers} closeModal={closeModal} handleRefresh={handleRefresh} />;
-        setComponet(newUserComponent);
-        openModal();
+        try {
+            const process = await processes();
+            const newUserComponent = <NewUser arrayProcesses={process} setDataUsers={setData} dataUsers={dataUsers} closeModal={closeModal} handleRefresh={handleRefresh} />;
+            setComponet(newUserComponent);
+            openModal();
+        } catch (error) {
+            console.error("Error al obtener los procesos:", error);
+        }
     }
 
-    const handleModify = ({ item }) => {
+    const handleModify = async ({ item }) => {
         setAction('modify');
-        const updateUserComponent = <ModifyUser data={item} setDataUsers={setDataUsers} closeModal={closeModal} />;
-        setComponet(updateUserComponent);
-        openModal();
+        try {
+            const process = await processes();
+            const updateUserComponent = <ModifyUser arrayProcesses={process} data={item} setDataUsers={setDataUsers} closeModal={closeModal} handleRefresh={handleRefresh} />;
+            setComponet(updateUserComponent);
+            openModal();
+        } catch (error) {
+            console.error("Error al obtener los procesos:", error);
+        }
     }
 
     const handleDelete = ({ item }) => {
@@ -77,7 +105,6 @@ function TableUserView() {
         }
         fetchDataAsync();
     }, []);
-    
 
     return (
         <>
@@ -136,12 +163,17 @@ function TableUserView() {
                         </th>
                         <th>
                             <div className="flex item-center justify-center">
-                                Contraseña
+                                Tipo de usuario
                             </div>
                         </th>
                         <th>
                             <div className="flex item-center justify-center">
-                                Tipo de usuario
+                                Proceso
+                            </div>
+                        </th>
+                        <th>
+                            <div className="flex item-center justify-center">
+                                Puesto
                             </div>
                         </th>
                         <th></th>
@@ -149,7 +181,7 @@ function TableUserView() {
                 </thead>
                 <tbody className="text-md text-black">
                     {dataUsers.map((item, index) => (
-                        <tr className="border-t border-slate-400" key={index}>
+                        <tr className={`border-t border-slate-400 ${index % 2 == 0 ? 'bg-slate-100' : ''}`} key={index}>
                             <td className="">
                                 <div className="flex item-center justify-center">
                                     {item.username}
@@ -161,13 +193,18 @@ function TableUserView() {
                                 </div>
                             </td>
                             <td className="">
-                                <div className="flex item-center justify-center ">
-                                    {item.password}
+                                <div className="flex item-center justify-center capitalize">
+                                    {item.type}
                                 </div>
                             </td>
                             <td className="">
                                 <div className="flex item-center justify-center capitalize">
-                                    {item.typeUser}
+                                    {item.process}
+                                </div>
+                            </td>
+                            <td className="">
+                                <div className="flex item-center justify-center capitalize">
+                                    {item.jobTitle}
                                 </div>
                             </td>
                             <td className="">
