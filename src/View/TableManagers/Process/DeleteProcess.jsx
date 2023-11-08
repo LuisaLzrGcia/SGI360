@@ -33,12 +33,12 @@ const DeleteProcess = ({ data = "", updateData, closeModal }) => {
         <div>Nombre del proceso</div>
         <input type="text"
           value={name}
-          disabled="false"
+          disabled={true}
           className="px-2 py-1 border rounded-md bg-gray-50" />
         <div>Abreviación</div>
         <input
           value={abbreviation}
-          disabled="false"
+          disabled={true}
           className="px-2 py-1 border rounded-md bg-gray-50" />
         <button
           onClick={() => handleDelete()}

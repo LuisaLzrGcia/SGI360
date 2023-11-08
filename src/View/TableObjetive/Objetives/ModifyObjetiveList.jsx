@@ -25,8 +25,10 @@ function ModifyObjetiveList({ closeModal, handleRefresh = () => { }, item }) {
                 newExpected: expected.trim(),
                 id: id
             };
+            console.log(dataToSave)
 
             const URL = `${API_SGI360}/admin/Objetive/updateObjetive.php`;
+            console.log(URL)
             const response = await fetch(URL, {
                 method: 'POST',
                 headers: {

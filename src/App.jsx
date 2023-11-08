@@ -1,6 +1,4 @@
-import { useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import React,{ useEffect, useState } from 'react'
 import './App.css'
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from './View/Login/Login';
@@ -11,8 +9,6 @@ import LayoutMainManager from './Manager/LayoutMainManager';
 function App() {
   const isLogin = sessionStorage.getItem("id_user_pk");
   const isAdmin = sessionStorage.getItem("type") == "Admin"
-  console.log(isLogin!=null)
-  console.log(isAdmin)
 
   return (
     <>

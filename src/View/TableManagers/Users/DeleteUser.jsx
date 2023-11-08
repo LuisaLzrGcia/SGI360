@@ -5,7 +5,6 @@ const API_SGI360 = import.meta.env.VITE_API_DATABASE;
 
 const DeleteUser = ({ data = "", setDataUsers, closeModal }) => {
   const { deleteDataUser } = useContext(SGIContext);
-  console.log(data)
   const { id, username, firstName, lastName, password, process, jobTitle, type } = data;
 
   const handleDelete = async (id) => {
@@ -27,38 +26,38 @@ const DeleteUser = ({ data = "", setDataUsers, closeModal }) => {
         </h1>
         <div>Nombre de usuario</div>
         <input type="text"
-          disabled="false"
+          disabled={true}
           value={username}
           className="px-2 py-1 border rounded-md bg-gray-50" />
         <div>Nombre</div>
         <input
           value={firstName}
-          disabled="false"
+          disabled={true}
           className="px-2 py-1 border rounded-md bg-gray-50" />
         <div>Apellido</div>
         <input
           value={lastName}
-          disabled="false"
+          disabled={true}
           className="px-2 py-1 border rounded-md bg-gray-50" />
         <div>Tipo de usuario</div>
         <input
           value={type}
-          disabled="false"
+          disabled={true}
           className="px-2 py-1 border rounded-md bg-gray-50 capitalize" />
-          <div>Puesto</div>
+        <div>Puesto</div>
         <input
           value={jobTitle}
-          disabled="false"
+          disabled={true}
           className="px-2 py-1 border rounded-md bg-gray-50 capitalize" />
-          <div>Proceso</div>
+        <div>Proceso</div>
         <input
           value={process}
-          disabled="false"
+          disabled={true}
           className="px-2 py-1 border rounded-md bg-gray-50 capitalize" />
         <div>Contraseña</div>
         <input
           value={password}
-          disabled="false"
+          disabled={true}
           className="px-2 py-1 border rounded-md bg-gray-50" />
         <button
           onClick={() => handleDelete(id)}

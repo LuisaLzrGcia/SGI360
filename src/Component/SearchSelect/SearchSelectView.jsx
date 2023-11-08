@@ -1,13 +1,13 @@
 import { SearchSelect, SearchSelectItem } from "@tremor/react";
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 export default function SearchSelectView({ placeholder = "", select = "", setSelectValue, valores }) {
     const [selectedValue, setSelectedValue] = useState(select);
 
     const handleValueChange = (selectedValue) => {
         setSelectValue(selectedValue)
-      };
-    
+    };
+
 
     return (
         <SearchSelect

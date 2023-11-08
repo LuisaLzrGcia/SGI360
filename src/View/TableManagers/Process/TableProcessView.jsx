@@ -29,23 +29,15 @@ async function fetchDataLenght() {
   }
 }
 
-const url = `${API_SGI360}/admin/Process/allProcess.php?page=`
+const url = `${API_SGI360}/admin/Process/allProcess.php`
 
 export default function TableProcessView() {
 
-  const [pageCurrent, setPageCurrent] = useState(1)
-  const processPageCurrent = async () => {
-    const processPageCurrent = await getData(url + pageCurrent);
-    console.log(processPageCurrent)
-    return processPageCurrent;
-  }
-
   const [dataProcess, setDataProcess] = useState([]);
-  const [currentItems, setCurrentItems] = useState(dataProcess.slice(0, 10));
   const [isOpen, setIsOpen] = useState(false);
   const [componet, setComponet] = useState("");
   const [action, setAction] = useState("new");
-  const [length, setLength] = useState(processLength)
+  const [length, setLength] = useState(0)
 
 
   const closeModal = () => setIsOpen(false);
@@ -60,7 +52,7 @@ export default function TableProcessView() {
 
   const handleModify = ({ item }) => {
     setAction('modify');
-    const updateProcessComponent = <ModifyProcess data={item} setData={updateData} closeModal={closeModal} />;
+    const updateProcessComponent = <ModifyProcess data={item} setData={handleRefresh} closeModal={closeModal} />;
     setComponet(updateProcessComponent);
     openModal();
   }
@@ -75,7 +67,7 @@ export default function TableProcessView() {
   const updateData = async () => {
     const allProcess = await getData(url + pageCurrent);
     setCurrentItems(allProcess)
-    const processLength = await getData(`${API_SGI360}/admin/Process/processLength.php`);
+    const processLength = fetchDataLenght();
     setLength(processLength)
   }
 
@@ -84,7 +76,6 @@ export default function TableProcessView() {
     async function fetchDataAsync() {
       const allProcessData = await fetchData();
       setDataProcess(allProcessData);
-      setCurrentItems(allProcessData.slice(0, 10));
     }
     fetchDataAsync();
   }, []);
@@ -124,16 +115,6 @@ export default function TableProcessView() {
           </button>
         </div>
         <div className='flex items-center justify-center w-4/6'>
-        {
-            <PaginationView
-              items={dataProcess}
-              setCurrentItems={setCurrentItems}
-              length={length}
-              url={url}
-              setPageCurrent={setPageCurrent}
-            />
-          }
-
         </div>
         <div className='flex items-center justify-end w-1/6'>
           <button
@@ -163,7 +144,7 @@ export default function TableProcessView() {
           </tr>
         </thead>
         <tbody className="text-md text-black">
-          {currentItems.map((item, index) => (
+          {dataProcess.map((item, index) => (
             <tr className={`border-t border-slate-400 ${index % 2 == 0 ? 'bg-slate-100' : ''}`} key={index}>
               <td className="">
                 <div className="flex item-center justify-center">

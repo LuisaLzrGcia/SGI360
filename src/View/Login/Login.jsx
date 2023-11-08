@@ -17,22 +17,26 @@ function Login() {
         const form = new FormData(e.target)
         const formData = Object.fromEntries(form)
         const { username, password } = formData;
+        console.log(formData)
         const data = await loginUser(username, password);
-        if (data.id_user_pk>0) {
+        console.log(data)
+        if (data.id_user_pk > 0) {
             getAuth(data)
-            if(sessionStorage.getItem("type")=="Admin"){
+            if (sessionStorage.getItem("type") == "Admin") {
                 window.location = "/admin"
-            }else{
+            } else {
                 window.location = "/manager"
-            } 
+            }
         } else {
             setFound(true)
         }
     }
 
     async function loginUser(usernameForm, passwordForm) {
+        const URL = `${API_SGI360}/login.php`;
+        console.log(URL)
         try {
-            const response = await fetch(`${API_SGI360}/login.php?user_name="${usernameForm}"&password="${passwordForm}"`, {
+            const response = await fetch(URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -48,6 +52,7 @@ function Login() {
             }
 
             const json = await response.json();
+            console.log(json)
             return json;
         } catch (error) {
             console.error('Error:', error.message);

@@ -1,3 +1,4 @@
+import React from 'react'
 import {
     ProgressBar,
     Card,
@@ -16,6 +17,7 @@ import CtrlDocumental from "./CtrlDocumental/CtrlDocumental";
 import AccionesCorrec from "./Acciones Correctivas/AccionesCorrec";
 import BarChartExample from "./BarChartExample";
 import BarChartView from "../../Charts/BarChartView";
+
 
 
 function DashboardGralView() {

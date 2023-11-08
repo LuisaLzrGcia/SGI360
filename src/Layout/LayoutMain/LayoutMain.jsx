@@ -1,8 +1,6 @@
 import React, { useContext, useState } from 'react'
-import Sidebar from '../Sidebar/Sidebar'
 import Navbar from '../Navbar/Navbar'
 import DashboardGral from '../Dashboards/DashboardGral'
-import Tables from '../Tables/Tables'
 import { SGIContext } from '../../Context/SGIContext'
 import ManagerView from '../../View/TableManagers/ManagerView'
 import TableDocumentsView from '../../View/TableDocuments/TableDocumentsView'

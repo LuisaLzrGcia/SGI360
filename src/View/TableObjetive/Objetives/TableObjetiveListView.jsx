@@ -84,6 +84,7 @@ function TableObjetiveListView() {
       .then(result => {
         if (result.status === 'Successfully') {
           alert("Objetivo eliminado")
+          handleRefresh()
         } else {
           console.log('Error al insertar');
         }

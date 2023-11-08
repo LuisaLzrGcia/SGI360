@@ -1,6 +1,5 @@
-import { useState } from "react";
-import { DateRangePicker, DateRangePickerItem } from "@tremor/react";
-import { es } from "date-fns/locale";
+import React from "react";
+import { DateRangePicker } from "@tremor/react";
 
 
 

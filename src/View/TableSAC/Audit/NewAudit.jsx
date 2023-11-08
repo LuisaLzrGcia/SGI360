@@ -3,11 +3,22 @@ import SearchSelectView from "../../../Component/SearchSelect/SearchSelectView";
 import { DatePicker } from "@tremor/react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import getData from "../../../Hooks/getData";
 const API_SGI360 = import.meta.env.VITE_API_DATABASE;
 
-function NewAudit({ handleRefresh = () => { }, closeModal, standarArray }) {
-  const namesStandar = standarArray.map(item => item.name);
-  const [standarName, setStandarName] = useState(namesStandar)
+async function fetchDataStandars() {
+  try {
+    const allUser = await getData(`${API_SGI360}/admin/Standar/getStandars.php`);
+    return allUser;
+  } catch (error) {
+    console.error("Error al obtener los datos:", error);
+    return [];
+  }
+}
+
+function NewAudit({ handleRefresh = () => { }, closeModal }) {
+  const [standarArray, setStandarArray] = useState([])
+  const [standarNames, setStandarNames] = useState([])
   const [codeInput, setCodeInput] = useState("");
   const [standarInput, setStandarInput] = useState("");
   const [descriptionInput, setDescriptionInput] = useState("");
@@ -62,6 +73,19 @@ function NewAudit({ handleRefresh = () => { }, closeModal, standarArray }) {
     typeInput.trim() == "" ||
     descriptionInput.trim() == "";
 
+    
+const fetchDataStandar = async () => {
+  const allData = await fetchDataStandars();
+  setStandarArray(allData);
+  const namesStandar = allData.map(item => item.name);
+  setStandarNames(namesStandar)
+};
+
+    useEffect(() => {
+      fetchDataStandar()
+    }, [standarArray])
+    
+
   return (
     <>
       <div className="grid grid-cols-1 mt-3">
@@ -96,7 +120,7 @@ function NewAudit({ handleRefresh = () => { }, closeModal, standarArray }) {
           placeholder="Seleccione un estándar"
           select={standarInput}
           setSelectValue={setStandarInput}
-          valores={standarName}
+          valores={standarNames}
         />
         <div>Descripción</div>
         <textarea
@@ -108,7 +132,7 @@ function NewAudit({ handleRefresh = () => { }, closeModal, standarArray }) {
         <button
           onClick={saveData}
           disabled={isEmpty}
-          className={`rounded-md p-2 text-white text-sm mt-1 ${isEmpty? 'bg-slate-500':'bg-slate-700'}
+          className={`rounded-md p-2 text-white text-sm mt-1 ${isEmpty ? 'bg-slate-500' : 'bg-slate-700'}
             `}
         >
           Guardar datos
