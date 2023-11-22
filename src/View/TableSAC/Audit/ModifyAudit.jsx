@@ -3,7 +3,8 @@ import SearchSelectView from "../../../Component/SearchSelect/SearchSelectView";
 import { DatePicker } from "@tremor/react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-const API_SGI360 = import.meta.env.VITE_API_DATABASE;
+import putAPI from "../../../Hooks/putAPI";
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
 
 function ModifyAudit({ item, handleRefresh = () => { }, closeModal, standarArray }) {
   const namesStandar = standarArray.map(item => item.name);
@@ -12,11 +13,11 @@ function ModifyAudit({ item, handleRefresh = () => { }, closeModal, standarArray
   const [standarInput, setStandarInput] = useState(item.standar_name);
   const [descriptionInput, setDescriptionInput] = useState(item.audit_description);
 
-  const fechaInicio = (item.audit_start_date).split('-');
-  const fechaInicioFomateada = new Date(fechaInicio[0], fechaInicio[1] - 1, fechaInicio[2]);
+  const fechaInicio = (item.formattedStartDate).split('-');
+  const fechaInicioFomateada = new Date(fechaInicio[2], fechaInicio[1] - 1, fechaInicio[0]);
   const [startDateInput, setStartDateInput] = useState(fechaInicioFomateada);
-  const fechaFin = (item.audit_finish_date).split('-');
-  const fechaFinFomateada = new Date(fechaFin[0], fechaFin[1] - 1, fechaFin[2]);
+  const fechaFin = (item.formattedFinishDate).split('-');
+  const fechaFinFomateada = new Date(fechaFin[2], fechaFin[1] - 1, fechaFin[0]);
   const [finishDateInput, setFinishDateInput] = useState(fechaFinFomateada);
 
   const [typeInput, setTypeInput] = useState(item.audit_type);
@@ -27,39 +28,18 @@ function ModifyAudit({ item, handleRefresh = () => { }, closeModal, standarArray
     const fechaFormateadaInicio = format(startDateInput, "yyyy-MM-dd");
     const fechaFormateadaCierre = format(finishDateInput, "yyyy-MM-dd");
     const standarFind = standarArray.find(item => item.name === standarInput)
-    const URL = `${API_SGI360}/admin/audit/updateAudit.php`;
+    const URL = `${API_SGI360_NODEJS}/audit`;
     const data = {
       code: codeInput.trim(),
-      id_standar: parseInt(standarFind.id.trim()),
+      idStandar: parseInt(standarFind.id_standar_pk),
       description: descriptionInput.trim(),
-      start_date: fechaFormateadaInicio,
-      finish_date: fechaFormateadaCierre,
+      startDate: fechaFormateadaInicio,
+      finishDate: fechaFormateadaCierre,
       type: typeInput.trim(),
       status: statusInput,
-      id: item.id_audit_pk
+      idAudit: item.id_audit_pk
     };
-
-    fetch(URL, {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-      .then(response => response.json())
-      .then(result => {
-        if (result.status === 'Successfully') {
-          alert("Datos guardados");
-          handleRefresh()
-          closeModal();
-        } else {
-          console.log('Error al insertar');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Error al intentar guardar los datos');
-      });
+    putAPI(URL, data, closeModal, handleRefresh)
   }
 
   const isEmpty =
@@ -99,14 +79,7 @@ function ModifyAudit({ item, handleRefresh = () => { }, closeModal, standarArray
           placeholder="Seleccione un tipo"
           select={statusInput}
           setSelectValue={setStatusInput}
-          valores={['Abierta', 'En proceso', 'Cerrada']}
-        />
-        <div>Código</div>
-        <input
-          type="text"
-          value={codeInput}
-          onChange={(event) => setCodeInput(event.target.value)}
-          className="px-2 py-1 border rounded-md bg-gray-50"
+          valores={['Abierta', 'Cerrada']}
         />
         <div>Estándar</div>
         <SearchSelectView
@@ -114,6 +87,13 @@ function ModifyAudit({ item, handleRefresh = () => { }, closeModal, standarArray
           select={standarInput}
           setSelectValue={setStandarInput}
           valores={standarName}
+        />
+        <div>Código</div>
+        <input
+          type="text"
+          value={codeInput}
+          onChange={(event) => setCodeInput(event.target.value)}
+          className="px-2 py-1 border rounded-md bg-gray-50"
         />
         <div>Descripción</div>
         <textarea

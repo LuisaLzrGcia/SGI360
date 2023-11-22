@@ -1,11 +1,7 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import LoginView from './LoginView'
-import FooterView from '../../Layout/Footer/FooterView'
-
 import useAuth from '../../Hooks/useAuth'
-import { SGIContext } from '../../Context/SGIContext'
-import getData from '../../Hooks/getData'
-const API_SGI360 = import.meta.env.VITE_API_DATABASE;
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
 
 function Login() {
     const { isAuth, getAuth, } = useAuth();
@@ -17,10 +13,10 @@ function Login() {
         const form = new FormData(e.target)
         const formData = Object.fromEntries(form)
         const { username, password } = formData;
-        console.log(formData)
         const data = await loginUser(username, password);
         console.log(data)
-        if (data.id_user_pk > 0) {
+        if (data != null) {
+            setFound(false)
             getAuth(data)
             if (sessionStorage.getItem("type") == "Admin") {
                 window.location = "/admin"
@@ -33,8 +29,7 @@ function Login() {
     }
 
     async function loginUser(usernameForm, passwordForm) {
-        const URL = `${API_SGI360}/login.php`;
-        console.log(URL)
+        const URL = `${API_SGI360_NODEJS}/login`;
         try {
             const response = await fetch(URL, {
                 method: 'POST',
@@ -50,7 +45,6 @@ function Login() {
             if (!response.ok) {
                 throw new Error('Error en la petición');
             }
-
             const json = await response.json();
             console.log(json)
             return json;

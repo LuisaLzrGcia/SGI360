@@ -1,46 +1,24 @@
 import React, { useContext, useEffect, useState } from "react";
 const API_SGI360 = import.meta.env.VITE_API_DATABASE;
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
+import deleteAPI from "../../../Hooks/deleteAPI"
 
 function DeleteStandar({ item, handleRefresh = () => { }, closeModal }) {
-  const idStandar = item.id;
+  const idStandar = item.id_standar_pk;
   const [nameInput, setNameInput] = useState(item.name);
   const [descriptionInput, setDescriptionInput] = useState(item.description);
 
   function saveData() {
-    const URL = `${API_SGI360}/admin/Standar/deleteStandar.php`;
-    console.log(URL)
-    const data = {
-      id: idStandar
-    };
-
-    console.log(data)
-    fetch(URL, {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-      .then(response => response.json())
-      .then(result => {
-        if (result.status === 'Successfully') {
-          alert("Datos eliminados");
-          handleRefresh()
-          closeModal();
-        } else {
-          console.log('Error al insertar');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Error al intentar guardar los datos');
-      });
+    const URL = `${API_SGI360_NODEJS}/standar/${idStandar}`;
+    deleteAPI(URL, closeModal, handleRefresh)
   }
-
 
   return (
     <>
       <div className="grid grid-cols-1 mt-3">
+        <h1 className="font-bold text-center my-1">
+          ¿Esta seguro de eliminar este estándar?
+        </h1>
         <div>Nombre del estándar</div>
         <input
           type="text"

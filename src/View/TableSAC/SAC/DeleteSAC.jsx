@@ -41,6 +41,9 @@ function DeleteSAC({ item, handleRefresh = () => { }, closeModal, }) {
   return (
     <>
       <div className="grid grid-cols-1 mt-3">
+        <h1 className="font-bold text-center my-1">
+          ¿Esta seguro de eliminar esta SAC?
+        </h1>
         <div>Estándar</div>
         <input
           type="text"

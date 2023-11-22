@@ -1,3 +1,5 @@
+import React from 'react'
+
 import {
   Card,
   Title,
@@ -63,7 +65,7 @@ function AccionesCorrecView() {
           <TabPanel>
             <div className="grid grid-cols-3">
               <BarChart
-                className="mt-6 col-span-2"
+                className="mt-6"
                 data={newData}
                 index="estandar"
                 categories={["porcentaje"]}

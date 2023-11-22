@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import getData from '../../../Hooks/getData';
+import getDataAPI from '../../../Hooks/getDataAPI';
 import { Badge, Table } from '@tremor/react';
 import ModalView from '../../../Component/Modal/ModalView';
 import SearchSelectView from '../../../Component/SearchSelect/SearchSelectView';
@@ -8,12 +8,11 @@ import { StatusOnlineIcon, CheckCircleIcon } from '@heroicons/react/solid';
 import NewSAC from './NewSAC';
 import DeleteSAC from './DeleteSAC';
 import ModifySAC from './ModifySAC';
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
 
-const API_SGI360 = import.meta.env.VITE_API_DATABASE;
-
-async function fetchDataSAC(parametros) {
+async function fetchDataSAC() {
     try {
-        const allData = await getData(`${API_SGI360}/admin/SAC/getSAC.php?${parametros}`);
+        const allData = await getDataAPI(`${API_SGI360_NODEJS}/sac`);
         return allData;
     } catch (error) {
         console.error("Error al obtener los datos:", error);
@@ -23,7 +22,7 @@ async function fetchDataSAC(parametros) {
 
 async function fetchDataStandars() {
     try {
-        const all = await getData(`${API_SGI360}/admin/Standar/getStandars.php`);
+        const all = await getDataAPI(`${API_SGI360_NODEJS}/standar`);
         return all;
     } catch (error) {
         console.error("Error al obtener los datos:", error);
@@ -33,7 +32,7 @@ async function fetchDataStandars() {
 
 async function fetchDataCode(standar) {
     try {
-        const all = await getData(`${API_SGI360}/admin/audit/getCodeAudit.php?standar=${standar}`);
+        const all = await getDataAPI(`${API_SGI360_NODEJS}/audit/standar/${encodeURI(standar)}`);
         return all;
     } catch (error) {
         console.error("Error al obtener los datos:", error);
@@ -134,8 +133,12 @@ function TableSACView() {
 
     useEffect(() => {
         fetchDataStandar();
+        console.log(standarInput)
+        if (standarInput != '') {
+            fetchCode(standarInput)
+        }
         fetchSAC();
-        fetchCode(standarInput)
+
         fetchProcess()
     }, [standarInput, codeInput, processInput, yearInput, statusInput]);
 
@@ -178,7 +181,7 @@ function TableSACView() {
                             placeholder="Seleccione un código"
                             select={codeInput}
                             setSelectValue={setCodeInput}
-                            valores={['Todos', ...codeAudit]}
+                            valores={['Todos',...codeAudit]}
                         />
                     </div>
                     <div className='m-2'>
@@ -187,7 +190,7 @@ function TableSACView() {
                             placeholder="Seleccione un proceso"
                             select={processInput}
                             setSelectValue={setProcessInput}
-                            valores={['Todos', ...processName]}
+                            valores={['Todos',...processName]}
                         />
                     </div>
                     <div className='m-2'>
@@ -204,7 +207,7 @@ function TableSACView() {
                         <SearchSelectView
                             placeholder="Seleccione un estado"
                             select={statusInput}
-                            setSelectValue={setStatusInput}
+                            setSelectValue={setStandarInput}
                             valores={['Todos', 'Abierta', 'Cerrada']}
                         />
                     </div>

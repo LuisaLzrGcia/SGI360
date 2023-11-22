@@ -5,13 +5,14 @@ import SidebarViewManager from './Views/Sidebar/SidebarViewManager';
 import TableObjetiveManager from './Views/Objetive/TableObjetiveManager';
 import TableDocumentsManager from './Views/Documents/TableDocumentsManager';
 import TableSACManager from './Views/SAC/TableSACManager';
+import DashboardGralView from '../Layout/Dashboards/DashboardGralView';
 
 function LayoutMainManager() {
     const [selectedComponent, setSelectedComponent] = useState('dashboard');
     const renderSelectedComponent = () => {
         switch (selectedComponent) {
             case 'dashboard':
-                return <DashboardGralManager />;
+                return <DashboardGralView/>;
             case 'documents':
                 return <TableDocumentsManager />
             case 'objetive':

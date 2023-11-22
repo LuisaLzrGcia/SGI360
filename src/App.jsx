@@ -3,7 +3,6 @@ import './App.css'
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from './View/Login/Login';
 import LayoutMain from './Layout/LayoutMain/LayoutMain';
-import useAuth from './Hooks/useAuth';
 import LayoutMainManager from './Manager/LayoutMainManager';
 
 function App() {

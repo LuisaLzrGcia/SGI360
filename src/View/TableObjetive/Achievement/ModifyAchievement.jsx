@@ -25,9 +25,7 @@ function ModifyAchievement({ closeModal, handleRefresh = () => { }, item }) {
                 newAchievement: parseInt(achievement.trim()),
                 id: id
             };
-            console.log(dataToSave)
             const URL = `${API_SGI360}/admin/Objetive/updateOneObjective.php`;
-            console.log(URL)
             const response = await fetch(URL, {
                 method: 'POST',
                 headers: {
@@ -94,12 +92,15 @@ function ModifyAchievement({ closeModal, handleRefresh = () => { }, item }) {
                     onChange={(e) => setCurrent(e.target.value)}
                 />
                 <div>Cumplimiento</div>
-                <input
-                    className=" w-full px-2 py-1 border rounded-md bg-gray-50 m-1"
-                    type="text"
-                    value={achievement}
-                    onChange={(e) => setAchievement(e.target.value)}
-                />
+                <div className='w-full px-2 py-1 border rounded-md bg-gray-50 m-1 flex justify-between'>
+                    <input
+                        className="bg-transparent hover:bg-transparent"
+                        type="text"
+                        value={achievement}
+                        onChange={(e) => setAchievement(e.target.value)}
+                    />
+                    <span className='font-semibold'>%</span>
+                </div>
                 <div className="flex items-center justify-center w-full">
                     <button
                         disabled={isDisable}

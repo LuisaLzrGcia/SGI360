@@ -7,13 +7,17 @@ import ModalView from "../../../Component/Modal/ModalView";
 import ModifyUser from "./ModifyUser";
 import NewUser from "./NewUser";
 import getData from "../../../Hooks/getData";
+import dataAPI from "../../../Hooks/getDataAPI";
 import DeleteUser from "./DeleteUser";
 import PaginationView from "../../../Component/Pagination/PaginationView";
-const API_SGI360 = import.meta.env.VITE_API_DATABASE;
+import { da } from "date-fns/locale";
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
+
 
 async function fetchData() {
     try {
-        const allUser = await getData(`${API_SGI360}/admin/allUsers.php`);
+        const URL = `${API_SGI360_NODEJS}/views/users_process`;
+        const allUser = await dataAPI(URL);
         return allUser;
     } catch (error) {
         console.error("Error al obtener los datos:", error);
@@ -22,7 +26,8 @@ async function fetchData() {
 }
 async function fetchDataProcess() {
     try {
-        const data = await getData(`${API_SGI360}/admin/Process/nameProcess.php`);
+        const URL=`${API_SGI360_NODEJS}/process`;
+        const data = await dataAPI(URL);
         return data
     } catch (error) {
         console.error("Error al obtener los datos:", error);
@@ -83,7 +88,7 @@ function TableUserView() {
 
     const handleDelete = ({ item }) => {
         setAction('delete');
-        const updateUserComponent = <DeleteUser data={item} setDataUsers={setDataUsers} closeModal={closeModal} />;
+        const updateUserComponent = <DeleteUser data={item} setDataUsers={handleRefresh} closeModal={closeModal} />;
         setComponet(updateUserComponent);
         openModal();
     }
@@ -184,12 +189,12 @@ function TableUserView() {
                         <tr className={`border-t border-slate-400 ${index % 2 == 0 ? 'bg-slate-100' : ''}`} key={index}>
                             <td className="">
                                 <div className="flex item-center justify-center">
-                                    {item.username}
+                                    {item.user_name}
                                 </div>
                             </td>
                             <td className="">
                                 <div className="flex item-center justify-center ">
-                                    {item.firstName + " " + item.lastName}
+                                    {item.first_name + " " + item.last_name}
                                 </div>
                             </td>
                             <td className="">
@@ -199,12 +204,12 @@ function TableUserView() {
                             </td>
                             <td className="">
                                 <div className="flex item-center justify-center capitalize">
-                                    {item.process}
+                                    {item.process_name}
                                 </div>
                             </td>
                             <td className="">
                                 <div className="flex item-center justify-center capitalize">
-                                    {item.jobTitle}
+                                    {item.job_title}
                                 </div>
                             </td>
                             <td className="">

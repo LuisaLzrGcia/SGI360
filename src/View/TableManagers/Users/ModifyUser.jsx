@@ -1,43 +1,41 @@
 import React, { useEffect, useState } from "react";
 import SelectView from "../../../Component/Select/SelectView";
 import AlertView from "../../../Component/Alert/AlertView";
-import getData from "../../../Hooks/getData";
 import SearchSelectView from "../../../Component/SearchSelect/SearchSelectView";
-const API_SGI360 = import.meta.env.VITE_API_DATABASE;
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
 
-const ModifyUser = ({ arrayProcesses, data = "", setDataUsers, closeModal , handleRefresh = () => { }}) => {
+
+const ModifyUser = ({ arrayProcesses, data = "", setDataUsers, closeModal, handleRefresh = () => { } }) => {
   const processName = arrayProcesses.map(item => item.name);
   processName.sort((a, b) => a.localeCompare(b));
-  const { id, username, firstName, lastName, password, type, jobTitle, process } = data;
-  const confirmPassword = password;
-  const [usernameInput, setUsernameInput] = useState(username);
-  const [firstNameInput, setFirstNameInput] = useState(firstName);
-  const [jobTitleInput, setJobTitleInput] = useState(jobTitle);
-  const [processInput, setProcessInput] = useState(process);
-  const [processIdInput, setProcessIdInput] = useState("")
-  const [lastNameInput, setLastNameInput] = useState(lastName);
-  const [passwordInput, setPasswordInput] = useState(password);
+  const confirmPassword = data.password;
+  const [usernameInput, setUsernameInput] = useState(data.user_name);
+  const [firstNameInput, setFirstNameInput] = useState(data.first_name);
+  const [jobTitleInput, setJobTitleInput] = useState(data.job_title);
+  const [processInput, setProcessInput] = useState(data.process_name);
+  const [lastNameInput, setLastNameInput] = useState(data.last_name);
+  const [passwordInput, setPasswordInput] = useState(data.password);
   const [confirmPasswordInput, setConfirmPasswordInput] = useState(confirmPassword);
-  const [typeUserInput, setTypeUserInput] = useState(type);
+  const [typeUserInput, setTypeUserInput] = useState(data.type);
   const [samePassword, setSamePassword] = useState(true)
 
   const saveData = async () => {
     const processFind = arrayProcesses.find(item => item.name === processInput)
     const dataToSave = {
-      userId: parseInt(data.id),
+      userId: parseInt(data.id_user_pk),
       newUsername: usernameInput,
       newPassword: passwordInput,
       newFirstName: firstNameInput,
       newLastName: lastNameInput,
       newTypeUser: typeUserInput,
       newJobTitle: jobTitleInput,
-      newIdProcess: parseInt(processFind.id)
+      newIdProcess: parseInt(processFind.id_process_pk)
     };
 
-    const URL = `${API_SGI360}/admin/users/updateUser.php`;
+    const URL = `${API_SGI360_NODEJS}/user`;
     console.log(URL)
     fetch(URL, {
-      method: 'POST',
+      method: 'PUT',
       headers: {
         'Content-type': 'application/json'
       },
@@ -54,7 +52,6 @@ const ModifyUser = ({ arrayProcesses, data = "", setDataUsers, closeModal , hand
         }
       })
       .catch(error => {
-        console.error('Error:', error);
         alert('Error al intentar guardar los datos');
       })
 

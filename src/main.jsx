@@ -2,11 +2,6 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
-import Login from './View/Login/Login.jsx'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import Sidebar from './Layout/Sidebar/Sidebar.jsx'
-import LayoutMain from './Layout/LayoutMain/LayoutMain.jsx'
-import Example from './Layout/Sidebar/prueba.jsx'
 import { SGIContextProvider } from './Context/SGIContext.jsx'
 
 

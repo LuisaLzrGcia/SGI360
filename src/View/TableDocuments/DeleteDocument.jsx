@@ -1,60 +1,22 @@
 import React, { useContext, useEffect, useState } from "react";
-const API_SGI360 = import.meta.env.VITE_API_DATABASE;
-import SelectView from "../../Component/Select/SelectView";
-import getData from "../../Hooks/getData";
-import SearchSelectView from "../../Component/SearchSelect/SearchSelectView";
-import { DatePicker } from "@tremor/react";
-import DatePickerView from "../../Component/DatePicker/DatePickerView";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
-
-async function fetchDataProcess() {
-  try {
-    const data = await getData(`${API_SGI360}/admin/Process/nameProcess.php`);
-    return data
-  } catch (error) {
-    console.error("Error al obtener los datos:", error);
-    return [];
-  }
-}
+import { getDateSQLFormated } from "../../Hooks/dateSQLFormated";
+import deleteAPI from "../../Hooks/deleteAPI";
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
 
 function DeleteDocument({ data, processes, refresh, closeModal }) {
   const processName = processes.map(item => item.name);
   processName.sort((a, b) => a.localeCompare(b));
-  const [idDocument, setIdDocument] = useState(data.id)
+  console.log(data)
+  const [idDocument, setIdDocument] = useState(data.id_document_pk)
 
   const fechaString = data.issuance_date;
   const partesFecha = fechaString.split("-");
   const fechaObjeto = new Date(`${partesFecha[2]}-${partesFecha[1]}-${parseInt(partesFecha[0]) + 1}`);
-  const [issuanceDateInput, setIssuanceDateInput] = useState(fechaObjeto)
+  const [issuanceDateInput, setIssuanceDateInput] = useState(getDateSQLFormated(data.issuance_date))
 
   function saveData() {
-    const URL = `${API_SGI360}/admin/Documents/deleteDocument.php`;
-    const data = {
-      id: parseInt(idDocument),
-    };
-    console.log(JSON.stringify(data))
-    fetch(URL, {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-      .then(response => response.json())
-      .then(result => {
-        if (result.status == 'Successfully') {
-          alert("Datos eliminados");
-          closeModal();
-          refresh()
-        } else {
-          console.log('Error al insertar');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Error al intentar guardar los datos');
-      });
+    const URL = `${API_SGI360_NODEJS}/documents/${idDocument}`;
+    deleteAPI(URL, closeModal, refresh)
   }
 
   return (
@@ -65,31 +27,31 @@ function DeleteDocument({ data, processes, refresh, closeModal }) {
           <input
             type="text"
             value={data.type}
-            disabled="false"
+            disabled={true}
             className="px-2 py-1 border rounded-md bg-gray-50 col-span-2" />
         </div>
         <div className="grid grid-cols-3 mb-2">
           <div>Proceso</div>
           <input
             type="text"
-            value={data.process}
-            disabled="false"
+            value={data.process_name}
+            disabled={true}
             className="px-2 py-1 border rounded-md bg-gray-50 col-span-2" />
         </div>
         <div className="grid grid-cols-3 mb-2">
           <div>Fecha de emisión</div>
           <input
             type="text"
-            value={data.issuance_date}
-            disabled="false"
+            value={data.issuance_date_formated}
+            disabled={true}
             className="px-2 py-1 border rounded-md bg-gray-50 col-span-2" />
         </div>
         <div className="grid grid-cols-3 mb-2">
           <div>Fecha de vigencia</div>
           <input
             type="text"
-            value={data.effective_date}
-            disabled="false"
+            value={data.effective_date_formated}
+            disabled={true}
             className="px-2 py-1 border rounded-md bg-gray-50 col-span-2" />
         </div>
         <div className="grid grid-cols-3 mb-2">
@@ -97,7 +59,7 @@ function DeleteDocument({ data, processes, refresh, closeModal }) {
           <input
             type="text"
             value={data.status}
-            disabled="false"
+            disabled={true}
             className="px-2 py-1 border rounded-md bg-gray-50 col-span-2" />
         </div>
         <div className="grid grid-cols-3 mb-2">
@@ -105,7 +67,7 @@ function DeleteDocument({ data, processes, refresh, closeModal }) {
           <input
             type="text"
             value={data.code}
-            disabled="false"
+            disabled={true}
             className="px-2 py-1 border rounded-md bg-gray-50 col-span-2"
           />
         </div>
@@ -113,7 +75,7 @@ function DeleteDocument({ data, processes, refresh, closeModal }) {
           <div>Título</div>
           <textarea
             value={data.title}
-            disabled="false"
+            disabled={true}
             className="px-2 py-1 border rounded-md bg-gray-50 col-span-2"
             name="" id="" cols="30" rows="2">
           </textarea>
@@ -123,7 +85,7 @@ function DeleteDocument({ data, processes, refresh, closeModal }) {
           <input
             type="text"
             value={data.reviewer}
-            disabled="false"
+            disabled={true}
             className="px-2 py-1 border rounded-md bg-gray-50 col-span-2" />
         </div>
         <div className="grid grid-cols-3 mb-2">
@@ -131,7 +93,7 @@ function DeleteDocument({ data, processes, refresh, closeModal }) {
           <input
             type="text"
             value={data.autorizer}
-            disabled="false"
+            disabled={true}
             className="px-2 py-1 border rounded-md bg-gray-50 col-span-2" />
         </div>
         <button

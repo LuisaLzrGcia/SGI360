@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import getData from '../../../Hooks/getData';
 import { Badge, Table } from '@tremor/react';
 import ModalView from '../../../Component/Modal/ModalView';
 import { ClockIcon, StatusOnlineIcon, CheckCircleIcon } from '@heroicons/react/solid';
@@ -7,20 +6,31 @@ import NewAudit from './NewAudit';
 import ModifyAudit from './ModifyAudit';
 import DeleteAudit from './DeleteAudit';
 import SearchSelectView from '../../../Component/SearchSelect/SearchSelectView';
-const API_SGI360 = import.meta.env.VITE_API_DATABASE;
+import getDataAPI from '../../../Hooks/getDataAPI';
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
+import { getDateSQLFormated } from '../../../Hooks/dateSQLFormated'
+
 
 async function fetchDataAudit(standarInput, typeInput, yearInput, statusInput) {
     try {
-        const parametros = `standarName=${encodeURIComponent(standarInput)}&auditType=${encodeURIComponent(typeInput)}&auditStatus=${encodeURIComponent(statusInput)}&year=${encodeURIComponent(yearInput)}`;
-        const URL = `${API_SGI360}/admin/audit/getAudit.php?${parametros}`;
-        const allData = await getData(URL);
-        const formattedData = allData.map(item => ({
-            ...item,
-            dateStartFormat: formatDate(item.audit_start_date),
-            dateFinishFormat: formatDate(item.audit_finish_date),
-        }));
-
-        return formattedData;
+        const URL = `${API_SGI360_NODEJS}/audit/filter`;
+        const data = {
+            standar: standarInput,
+            type: typeInput,
+            year: yearInput,
+            status: statusInput
+        };
+        let allData = await getDataAPI(URL, "POST", data);
+        allData = allData.map((item) => {
+            const formattedStartDate = getDateSQLFormated(item.audit_start_date);
+            const formattedFinishDate = getDateSQLFormated(item.audit_finish_date);
+            return {
+                ...item,
+                formattedStartDate,
+                formattedFinishDate,
+            };
+        });
+        return allData;
     } catch (error) {
         console.error("Error al obtener los datos:", error);
         return [];
@@ -35,7 +45,7 @@ function formatDate(dateString) {
 
 async function fetchDataStandars() {
     try {
-        const allUser = await getData(`${API_SGI360}/admin/Standar/getStandars.php`);
+        const allUser = await getDataAPI(`${API_SGI360_NODEJS}/standar`);
         return allUser;
     } catch (error) {
         console.error("Error al obtener los datos:", error);
@@ -66,7 +76,11 @@ function TableAuditView() {
     const openModal = () => { setIsOpen(true) };
 
     const handleRefresh = async () => {
-        fetchAudit()
+        if (standarInput != '' && typeInput != '' && yearInput != '' && statusInput != '') {
+            fetchAudit();
+        } else {
+            setDataTable([])
+        }
     }
 
     const handleNew = () => {
@@ -104,7 +118,11 @@ function TableAuditView() {
 
     useEffect(() => {
         fetchDataStandar();
-        fetchAudit();
+        if (standarInput != '' && typeInput != '' && yearInput != '' && statusInput != '') {
+            fetchAudit();
+        } else {
+            setDataTable([])
+        }
     }, [standarInput, typeInput, yearInput, statusInput]);
 
 
@@ -255,11 +273,11 @@ function TableAuditView() {
                             </td>
                             <td className="">
                                 <div className="flex item-center justify-center ">
-                                    {item.dateStartFormat}                                </div>
+                                    {item.formattedStartDate}                                </div>
                             </td>
                             <td className="">
                                 <div className="flex item-center justify-center ">
-                                    {item.dateFinishFormat}
+                                    {item.formattedFinishDate}
                                 </div>
                             </td>
                             <td className="">

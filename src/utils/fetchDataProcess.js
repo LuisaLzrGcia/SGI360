@@ -1,9 +1,9 @@
-import getData from "../Hooks/getData";
-const API_SGI360 = import.meta.env.VITE_API_DATABASE;
+import getDataAPI from "../Hooks/getDataAPI"; 
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
 
 export async function fetchDataProcess() {
   try {
-    const data = await getData(`${API_SGI360}/admin/Process/nameProcess.php`);
+    const data = await getDataAPI(`${API_SGI360_NODEJS}/process`);
     return data;
   } catch (error) {
     console.error("Error al obtener los datos:", error);

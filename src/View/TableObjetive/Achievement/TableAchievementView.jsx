@@ -21,7 +21,6 @@ async function fetchDataObjetive(month, year, process) {
   try {
     const URL = `${API_SGI360}/admin/Objetive/getObjetive.php?id_month_fk=${month}&year=${year}&id_process_fk=${process}`;
     const allData = await getData(URL);
-    console.log(allData)
     return allData;
   } catch (error) {
     console.error("Error al obtener los datos:", error);
@@ -118,7 +117,7 @@ function TableAchievementView() {
             //   );
             case 'modify':
               return (
-                <ModalView openModal={openModal} closeModal={closeModal} isOpen={isOpen} componentReact={componet} title={"Modificar"} sizeModal={""} sizeModalMax={""} />
+                <ModalView openModal={openModal} closeModal={closeModal} isOpen={isOpen} componentReact={componet} title={"Modificar cumplimiento"} sizeModal={""} sizeModalMax={""} />
               );
             // case 'delete':
             //   return (

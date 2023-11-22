@@ -141,7 +141,7 @@ function TableObjetiveListView() {
             );
           case 'modify':
             return (
-              <ModalView openModal={openModal} closeModal={closeModal} isOpen={isOpen} componentReact={componet} title={"Modificar"} sizeModal={""} sizeModalMax={""} />
+              <ModalView openModal={openModal} closeModal={closeModal} isOpen={isOpen} componentReact={componet} title={"Modificar objetivo"} sizeModal={""} sizeModalMax={""} />
             );
           default:
             return null;
@@ -232,17 +232,17 @@ function TableObjetiveListView() {
                 </div>
               </td>
               <td className="">
-                <div className="flex item-center justify-center  mx-1">
+                <div className="flex item-center justify-center text-center mx-1">
                   {item.application}
                 </div>
               </td>
               <td className="">
-                <div className="flex item-center justify-center mx-1">
+                <div className="flex item-center justify-center text-center mx-1">
                   {item.objective}
                 </div>
               </td>
               <td className="">
-                <div className="flex item-center justify-center mx-1">
+                <div className="flex item-center justify-center text-center mx-1">
                   {item.expected}
                 </div>
               </td>

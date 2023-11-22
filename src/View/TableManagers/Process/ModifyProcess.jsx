@@ -1,23 +1,44 @@
 import React, { useEffect, useState } from "react";
 import getData from "../../../Hooks/getData";
-const API_SGI360 = import.meta.env.VITE_API_DATABASE;
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
 
-const ModifyProcess = ({ data = "", setData = "", closeModal}) => {
-  const [process, setProcess] = useState(data.name)
-  const [abbreviation, setAbbreviation] = useState(data.abbreviation)
+const ModifyProcess = ({ processData = "", setData = "", closeModal }) => {
+  const [process, setProcess] = useState(processData.name)
+  const [abbreviation, setAbbreviation] = useState(processData.abbreviation)
 
   const saveData = async () => {
-    const update = await getData(
-      `${API_SGI360}/admin/Process/updateProcess.php?processId=${encodeURIComponent(data.id)}&newNameProcess=${encodeURIComponent(process)}&newAbbreviation=${encodeURIComponent(abbreviation)}`
-    );
-    if (update == 'Successfully') {
-      alert("Datos guardados");
-      setData()
-      closeModal();
-    } else {
-      alert("Error al intentar guardar los datos");
-    }
+    const URL = `${API_SGI360_NODEJS}/process`;
+    const data = {
+      newNameProcess: process,
+      newAbbreviation: abbreviation,
+      processId: processData.id_process_pk
+    };
+
+    fetch(URL, {
+      method: 'PUT',
+      headers: {
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+      .then(response => response.json())
+      .then(result => {
+        if (result.status === 'Successfully') {
+          alert("Datos guardados");
+          setData()
+          closeModal();
+        } else {
+          console.log('Error al insertar');
+        }
+      })
+      .catch(error => {
+        console.log(result.status)
+        console.error('Error:', error);
+        alert('Error al intentar guardar los datos');
+      });
+      
   }
+
   return (
     <>
       <div className="grid grid-cols-1 mt-3">

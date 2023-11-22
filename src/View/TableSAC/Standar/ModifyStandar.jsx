@@ -1,44 +1,23 @@
-import React, { useContext, useEffect, useState } from "react";
-const API_SGI360 = import.meta.env.VITE_API_DATABASE;
+import React, {useState } from "react";
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
+import putAPI from "../../../Hooks/putAPI"
+
 
 function ModifyStandar({ item, handleRefresh = () => { }, closeModal }) {
-  const idStandar = item.id;
+  const idStandar = item.id_standar_pk;
   const [nameInput, setNameInput] = useState(item.name);
   const [descriptionInput, setDescriptionInput] = useState(item.description);
 
   function saveData() {
-    const URL = `${API_SGI360}/admin/Standar/updateStandar.php`;
-    console.log(URL)
+    const URL = `${API_SGI360_NODEJS}/standar`;
     const data = {
       name: nameInput,
       description: descriptionInput,
-      id: idStandar
+      idStandar: idStandar
     };
 
-    console.log(data)
-    fetch(URL, {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-      .then(response => response.json())
-      .then(result => {
-        if (result.status === 'Successfully') {
-          alert("Datos guardados");
-          handleRefresh()
-          closeModal();
-        } else {
-          console.log('Error al insertar');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Error al intentar guardar los datos');
-      });
+    putAPI(URL, data, closeModal, handleRefresh)
   }
-
 
   return (
     <>

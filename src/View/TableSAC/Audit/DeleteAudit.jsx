@@ -1,43 +1,21 @@
 import React, { useContext, useEffect, useState } from "react";
-const API_SGI360 = import.meta.env.VITE_API_DATABASE;
+import deleteAPI from '../../../Hooks/deleteAPI'
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
 
 function DeleteAudit({ item, handleRefresh = () => { }, closeModal }) {
   const [codeInput, setCodeInput] = useState(item.audit_code);
   const [standarInput, setStandarInput] = useState(item.standar_name);
   const [descriptionInput, setDescriptionInput] = useState(item.audit_description);
-  const [startDateInput, setStartDateInput] = useState(item.dateStartFormat);
-  const [finishDateInput, setFinishDateInput] = useState(item.dateFinishFormat);
+  const [startDateInput, setStartDateInput] = useState(item.formattedStartDate);
+  const [finishDateInput, setFinishDateInput] = useState(item.formattedFinishDate);
+
 
   const [typeInput, setTypeInput] = useState(item.audit_type);
   const [statusInput, setStatusInput] = useState(item.audit_status)
 
   function saveData() {
-    const URL = `${API_SGI360}/admin/audit/deleteAudit.php`;
-    const data = {
-      id: item.id_audit_pk
-    };
-
-    fetch(URL, {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-      .then(response => response.json())
-      .then(result => {
-        if (result.status === 'Successfully') {
-          alert("Datos eliminados");
-          handleRefresh()
-          closeModal();
-        } else {
-          console.log('Error al insertar');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Error al intentar guardar los datos');
-      });
+    const URL = `${API_SGI360_NODEJS}/audit/${item.id_audit_pk}`;
+    deleteAPI(URL, closeModal, handleRefresh)
   }
 
   const isEmpty =
@@ -51,6 +29,9 @@ function DeleteAudit({ item, handleRefresh = () => { }, closeModal }) {
   return (
     <>
       <div className="grid grid-cols-1 mt-3">
+        <h1 className="font-bold text-center my-1">
+          ¿Esta seguro de eliminar esta auditoría?
+        </h1>
         <div>Fecha de inicio</div>
         <input
           type="text"

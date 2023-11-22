@@ -99,7 +99,7 @@ function TableObjetiveManager() {
                 //   );
                 case 'modify':
                   return (
-                    <ModalView openModal={openModal} closeModal={closeModal} isOpen={isOpen} componentReact={componet} title={"Modificar"} sizeModal={""} sizeModalMax={""} />
+                    <ModalView openModal={openModal} closeModal={closeModal} isOpen={isOpen} componentReact={componet} title={"Modificar objetivos"} sizeModal={""} sizeModalMax={""} />
                   );
                 // case 'delete':
                 //   return (

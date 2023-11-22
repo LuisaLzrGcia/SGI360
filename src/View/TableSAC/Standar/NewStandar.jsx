@@ -1,39 +1,21 @@
 import React, { useContext, useEffect, useState } from "react";
 const API_SGI360 = import.meta.env.VITE_API_DATABASE;
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
+import postAPI from '../../../Hooks/postAPI';
+
 
 function NewStandar({ handleRefresh = () => { }, closeModal }) {
   const [nameInput, setNameInput] = useState("");
   const [descriptionInput, setDescriptionInput] = useState("");
 
   function saveData() {
-    const URL = `${API_SGI360}/admin/Standar/insertStandar.php`;
+    const URL = `${API_SGI360_NODEJS}/standar`;
     const data = {
       name: nameInput,
       description: descriptionInput
     };
-    fetch(URL, {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-      .then(response => response.json())
-      .then(result => {
-        if (result.status === 'Successfully') {
-          alert("Datos guardados");
-          handleRefresh()
-          closeModal();
-        } else {
-          console.log('Error al insertar');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Error al intentar guardar los datos');
-      });
+    postAPI(URL, data, closeModal, handleRefresh)
   }
-
 
   return (
     <>

@@ -1,11 +1,12 @@
-import React, { useContext, useEffect, useState } from "react";
-const API_SGI360 = import.meta.env.VITE_API_DATABASE;
+import React, { useState } from "react";
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
+
 
 function NewProcess({ setData = "", closeModal, updateData }) {
   const [nameInput, setNameInput] = useState("");
   const [abbreviationInput, setAbbreviationInput] = useState("");
   function saveData() {
-    const URL = `${API_SGI360}/admin/Process/insertProcess.php`;
+    const URL = `${API_SGI360_NODEJS}/process`;
     const data = {
       newNameProcess: nameInput,
       newAbbreviation: abbreviationInput

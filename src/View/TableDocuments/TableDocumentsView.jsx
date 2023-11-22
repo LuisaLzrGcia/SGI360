@@ -1,26 +1,39 @@
 import { Badge, Card, TabPanel, Table } from '@tremor/react';
 import React, { useEffect, useState } from 'react';
-import getData from '../../Hooks/getData';
+import getDataAPI from '../../Hooks/getDataAPI';
 import NewDocument from './NewDocument';
 import ModalView from '../../Component/Modal/ModalView';
 import { ExclamationCircleIcon, StatusOnlineIcon } from "@heroicons/react/solid";
 import ModifyDocument from './ModifyDocument';
 import SelectView from '../../Component/Select/SelectView';
 import DeleteDocument from './DeleteDocument';
+import { getDateSQLFormated } from '../../Hooks/dateSQLFormated';
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
 
-const API_SGI360 = import.meta.env.VITE_API_DATABASE;
 async function fetchDataDocuments() {
   try {
-    const data = await getData(`${API_SGI360}/admin/Documents/allDocuments.php`);
-    return data;
+    const data = await getDataAPI(`${API_SGI360_NODEJS}/documents`);
+    const formattedData = data.map((document) => {
+      console.log(document.issuance_date)
+      const issuanceDateFormated = getDateSQLFormated(document.issuance_date)
+      console.log(issuanceDateFormated)
+      const effectiveDateFormated = getDateSQLFormated(document.effective_date)
+      return {
+        ...document,
+        issuance_date_formated: issuanceDateFormated,
+        effective_date_formated: effectiveDateFormated,
+      };
+    });
+    return formattedData;
   } catch (error) {
     console.error("Error al obtener los datos:", error);
     return [];
   }
 }
+
 async function fetchDataProcess() {
   try {
-    const data = await getData(`${API_SGI360}/admin/Process/nameProcess.php`);
+    const data = await getDataAPI(`${API_SGI360_NODEJS}/process`);
     return data
   } catch (error) {
     console.error("Error al obtener los datos:", error);
@@ -53,7 +66,6 @@ export default function TableDocumentsView() {
     setTypeSearch("Todo")
     setProcessSearch("Todo")
     setData(allData);
-
   }
   const processes = async () => {
     const allData = await fetchDataProcess();
@@ -359,7 +371,7 @@ export default function TableDocumentsView() {
                     </td>
                     <td className="">
                       <div className="flex item-center justify-center ">
-                        {item.effective_date}
+                        {item.effective_date_formated}
                       </div>
                     </td>
                     <td className="">
@@ -388,7 +400,7 @@ export default function TableDocumentsView() {
                     </td>
                     <td className="">
                       <div className="flex item-center justify-center text-center">
-                        {item.process}
+                        {item.process_name}
                       </div>
                     </td>
                     <td className="">

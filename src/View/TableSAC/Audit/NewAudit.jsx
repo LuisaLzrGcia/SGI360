@@ -3,12 +3,13 @@ import SearchSelectView from "../../../Component/SearchSelect/SearchSelectView";
 import { DatePicker } from "@tremor/react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import getData from "../../../Hooks/getData";
-const API_SGI360 = import.meta.env.VITE_API_DATABASE;
+import getDataAPI from '../../../Hooks/getDataAPI';
+import postAPI from '../../../Hooks/postAPI';
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
 
 async function fetchDataStandars() {
   try {
-    const allUser = await getData(`${API_SGI360}/admin/Standar/getStandars.php`);
+    const allUser = await getDataAPI(`${API_SGI360_NODEJS}/standar`);
     return allUser;
   } catch (error) {
     console.error("Error al obtener los datos:", error);
@@ -31,38 +32,18 @@ function NewAudit({ handleRefresh = () => { }, closeModal }) {
     const fechaFormateadaInicio = format(startDateInput, "yyyy-MM-dd");
     const fechaFormateadaCierre = format(finishDateInput, "yyyy-MM-dd");
     const standarFind = standarArray.find(item => item.name === standarInput)
-    const URL = `${API_SGI360}/admin/audit/insertAudit.php`;
+    const URL = `${API_SGI360_NODEJS}/audit`;
     const data = {
       code: codeInput.trim(),
-      id_standar: parseInt(standarFind.id.trim()),
+      idStandar: parseInt(standarFind.id_standar_pk),
       description: descriptionInput.trim(),
       start_date: fechaFormateadaInicio,
       finish_date: fechaFormateadaCierre,
       type: typeInput.trim(),
       status: 'Abierta'
-
     };
-    fetch(URL, {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-      .then(response => response.json())
-      .then(result => {
-        if (result.status === 'Successfully') {
-          alert("Datos guardados");
-          handleRefresh()
-          closeModal();
-        } else {
-          console.log('Error al insertar');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Error al intentar guardar los datos');
-      });
+    console.log(data)
+    postAPI(URL, data, closeModal, handleRefresh)
   }
 
   const isEmpty =
@@ -73,18 +54,18 @@ function NewAudit({ handleRefresh = () => { }, closeModal }) {
     typeInput.trim() == "" ||
     descriptionInput.trim() == "";
 
-    
-const fetchDataStandar = async () => {
-  const allData = await fetchDataStandars();
-  setStandarArray(allData);
-  const namesStandar = allData.map(item => item.name);
-  setStandarNames(namesStandar)
-};
 
-    useEffect(() => {
-      fetchDataStandar()
-    }, [standarArray])
-    
+  const fetchDataStandar = async () => {
+    const allData = await fetchDataStandars();
+    setStandarArray(allData);
+    const namesStandar = allData.map(item => item.name);
+    setStandarNames(namesStandar)
+  };
+
+  useEffect(() => {
+    fetchDataStandar()
+  }, [standarArray])
+
 
   return (
     <>
@@ -108,19 +89,19 @@ const fetchDataStandar = async () => {
           setSelectValue={setTypeInput}
           valores={['Interna', 'Externa']}
         />
-        <div>Código</div>
-        <input
-          type="text"
-          value={codeInput}
-          onChange={(event) => setCodeInput(event.target.value)}
-          className="px-2 py-1 border rounded-md bg-gray-50"
-        />
         <div>Estándar</div>
         <SearchSelectView
           placeholder="Seleccione un estándar"
           select={standarInput}
           setSelectValue={setStandarInput}
           valores={standarNames}
+        />
+        <div>Código</div>
+        <input
+          type="text"
+          value={codeInput}
+          onChange={(event) => setCodeInput(event.target.value)}
+          className="px-2 py-1 border rounded-md bg-gray-50"
         />
         <div>Descripción</div>
         <textarea

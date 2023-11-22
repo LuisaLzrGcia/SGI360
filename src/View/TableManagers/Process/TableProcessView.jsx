@@ -1,35 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import getData from '../../../Hooks/getData';
+import getDataAPI from '../../../Hooks/getDataAPI';
 import { Table } from '@tremor/react';
 import PaginationView from '../../../Component/Pagination/PaginationView';
 import ModalView from '../../../Component/Modal/ModalView';
 import ModifyProcess from './ModifyProcess';
 import NewProcess from './NewProcess';
 import DeleteProcess from './DeleteProcess';
-
-const API_SGI360 = import.meta.env.VITE_API_DATABASE;
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
 
 async function fetchData() {
   try {
-    const allUser = await getData(`${API_SGI360}/admin/Process/allProcess.php`);
-    return allUser;
+    const data = await getDataAPI(`${API_SGI360_NODEJS}/process`);
+    return data;
   } catch (error) {
     console.error("Error al obtener los datos:", error);
     return [];
   }
 }
-async function fetchDataLenght() {
-  try {
-    const processLength = await getData(`${API_SGI360}/admin/Process/processLength.php`);
-    // Aquí continúas con el código si la llamada fue exitosa
-    return processLength
-  } catch (error) {
-    // Aquí manejas el error
-    console.error("Error al obtener datos:", error);
-  }
-}
-
-const url = `${API_SGI360}/admin/Process/allProcess.php`
 
 export default function TableProcessView() {
 
@@ -45,32 +32,24 @@ export default function TableProcessView() {
 
   const handleNew = () => {
     setAction('new');
-    const newProcessComponent = <NewProcess setData={setDataProcess} closeModal={closeModal} updateData={updateData}/>;
+    const newProcessComponent = <NewProcess setData={setDataProcess} closeModal={closeModal} updateData={handleRefresh}/>;
     setComponet(newProcessComponent);
     openModal();
   }
 
   const handleModify = ({ item }) => {
     setAction('modify');
-    const updateProcessComponent = <ModifyProcess data={item} setData={handleRefresh} closeModal={closeModal} />;
+    const updateProcessComponent = <ModifyProcess processData={item} setData={handleRefresh} closeModal={closeModal} />;
     setComponet(updateProcessComponent);
     openModal();
   }
 
   const handleDelete = ({ item }) => {
     setAction('delete');
-    const updateComponent = <DeleteProcess data={item} updateData={updateData} closeModal={closeModal} />;
+    const updateComponent = <DeleteProcess data={item} updateData={handleRefresh} closeModal={closeModal} />;
     setComponet(updateComponent);
     openModal();
   }
-
-  const updateData = async () => {
-    const allProcess = await getData(url + pageCurrent);
-    setCurrentItems(allProcess)
-    const processLength = fetchDataLenght();
-    setLength(processLength)
-  }
-
 
   useEffect(() => {
     async function fetchDataAsync() {

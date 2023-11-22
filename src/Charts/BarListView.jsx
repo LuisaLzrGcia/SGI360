@@ -1,4 +1,5 @@
 import { BarList, Bold, Flex, Text } from "@tremor/react";
+import React from 'react'
 
 
 function BarListView({ column1, column2, data }) {

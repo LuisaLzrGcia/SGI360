@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import getData from '../../../Hooks/getData';
 import { Table } from '@tremor/react';
 import NewStandar from './NewStandar';
 import ModalView from '../../../Component/Modal/ModalView';
 import ModifyStandar from './ModifyStandar';
 import DeleteStandar from './DeleteStandar';
-const API_SGI360 = import.meta.env.VITE_API_DATABASE;
+import getDataAPI from '../../../Hooks/getDataAPI';
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
+
 
 async function fetchDataStandars() {
     try {
-        const allUser = await getData(`${API_SGI360}/admin/Standar/getStandars.php`);
-        return allUser;
+        const data = await getDataAPI(`${API_SGI360_NODEJS}/standar`);
+        return data;
     } catch (error) {
         console.error("Error al obtener los datos:", error);
         return [];

@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 const API_SGI360 = import.meta.env.VITE_API_DATABASE;
 import SelectView from "../../Component/Select/SelectView";
-import getData from "../../Hooks/getData";
 import SearchSelectView from "../../Component/SearchSelect/SearchSelectView";
 import { DatePicker } from "@tremor/react";
-import DatePickerView from "../../Component/DatePicker/DatePickerView";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { getDateSQLFormated, setDateSQLFormated } from "../../Hooks/dateSQLFormated";
+import postAPI from "../../Hooks/postAPI";
 function NewDocument({ processes, closeModal, handleRefresh = () => { } }) {
   const [arrayProcess, setArrayProcess] = useState(processes)
   const processName = processes.map(item => item.name);
@@ -20,45 +20,34 @@ function NewDocument({ processes, closeModal, handleRefresh = () => { } }) {
   const [autorizerInput, setAutorizerInput] = useState("")
   const [issuanceDateInput, setIssuanceDateInput] = useState("")
   const [daysInput, setDaysInput] = useState(1096)
+  const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
 
   function saveData() {
     const processFind = arrayProcess.find(item => item.name === processInput)
-    const fechaFormateada = format(issuanceDateInput, "yyyy-MM-dd");
-    const URL = `${API_SGI360}/admin/Documents/insertDocument.php`;
+    const issuanceDateFormated = setDateSQLFormated(issuanceDateInput)
+    const URL = `${API_SGI360_NODEJS}/documents`;
     const data = {
       newType: typeInput,
       newCode: codeInput,
       newTitle: titleInput,
       newReviewer: reviewerInput,
       newAutorizer: autorizerInput,
-      newIssuanceDate: fechaFormateada,
+      newIssuanceDate: issuanceDateFormated,
       newDays: daysInput,
-      newProcess: parseInt(processFind.id)
+      newProcess: parseInt(processFind.id_process_pk)
     };
-    console.log(URL)
+    console.log(data)
 
-    fetch(URL, {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-      .then(response => response.json())
-      .then(result => {
-        if (result.status === 'Successfully') {
-          alert("Datos guardados");
-          handleRefresh();
-          closeModal();
-        } else {
-          console.log('Error al insertar');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Error al intentar guardar los datos');
-      });
+    postAPI(URL, data, closeModal, handleRefresh);
   }
+  const isEmpty =
+    typeInput == "" ||
+    processInput == "" ||
+    issuanceDateInput == null ||
+    codeInput.trim() == "" ||
+    reviewerInput.trim() == "" ||
+    autorizerInput.trim() == "" ||
+    daysInput == "";
 
   return (
     <>
@@ -140,7 +129,9 @@ function NewDocument({ processes, closeModal, handleRefresh = () => { } }) {
         </div>
         <button
           onClick={saveData}
-          className={`rounded-md p-2 text-white text-sm mt-1 bg-slate-700`}
+          disabled={isEmpty}
+          className={`rounded-md p-2 text-white text-sm mt-1 ${isEmpty ? 'bg-slate-500' : 'bg-slate-700'}
+            `}
         >
           Guardar datos
         </button>

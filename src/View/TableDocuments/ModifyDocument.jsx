@@ -1,22 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
 const API_SGI360 = import.meta.env.VITE_API_DATABASE;
 import SelectView from "../../Component/Select/SelectView";
-import getData from "../../Hooks/getData";
+import getDataAPI from "../../Hooks/getDataAPI";
 import SearchSelectView from "../../Component/SearchSelect/SearchSelectView";
 import { DatePicker } from "@tremor/react";
 import DatePickerView from "../../Component/DatePicker/DatePickerView";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-
-async function fetchDataProcess() {
-  try {
-    const data = await getData(`${API_SGI360}/admin/Process/nameProcess.php`);
-    return data
-  } catch (error) {
-    console.error("Error al obtener los datos:", error);
-    return [];
-  }
-}
+import postAPI from "../../Hooks/postAPI";
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
 
 function ModifyDocument({ data, processes, refresh, closeModal }) {
   const processName = processes.map(item => item.name);
@@ -24,21 +16,30 @@ function ModifyDocument({ data, processes, refresh, closeModal }) {
   const [idDocument, setIdDocument] = useState(data.id)
   const [nameProcesses, setNameProcesses] = useState(processName)
   const [typeInput, setTypeInput] = useState(data.type)
-  const [processInput, setProcessInput] = useState(data.process)
+  const [processInput, setProcessInput] = useState(data.process_name)
   const [codeInput, setCodeInput] = useState(data.code)
   const [titleInput, setTitleInput] = useState(data.title)
   const [reviewerInput, setReviewerInput] = useState(data.reviewer)
   const [autorizerInput, setAutorizerInput] = useState(data.autorizer)
   const fechaString = data.issuance_date;
+  console.log("data.issuance_date", data.issuance_date)
   const partesFecha = fechaString.split("-");
-  const fechaObjeto = new Date(`${partesFecha[2]}-${partesFecha[1]}-${parseInt(partesFecha[0]) + 1}`);
-  const [issuanceDateInput, setIssuanceDateInput] = useState(fechaObjeto)
+  console.log("partesFecha", partesFecha)
+  const mes = parseInt(partesFecha[1]) - 1;
+  console.log("data.issuance_date_formated", data.issuance_date_formated)
+  console.log(partesFecha[2])
+  console.log(mes)
+  console.log(partesFecha[0])
+  const fechaObjeto = new Date(partesFecha[2], mes, partesFecha[0]);
+
+  const [issuanceDateInput, setIssuanceDateInput] = useState(fechaObjeto);
+
   const [daysInput, setDaysInput] = useState(data.days)
 
   function saveData() {
     const processFind = processes.find(item => item.name === processInput)
     const fechaFormateada = format(issuanceDateInput, "yyyy-MM-dd");
-    const URL = `${API_SGI360}/admin/Documents/updateDocument.php`;
+    const URL = `${API_SGI360}/documents`;
     const data = {
       id: idDocument,
       newType: typeInput,
@@ -50,27 +51,8 @@ function ModifyDocument({ data, processes, refresh, closeModal }) {
       newDays: parseInt(daysInput),
       newProcess: parseInt(processFind.id)
     };
-    fetch(URL, {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-      .then(response => response.json())
-      .then(result => {
-        if (result.status == 'Successfully') {
-          alert("Datos guardados");
-          closeModal();
-          refresh()
-        } else {
-          console.log('Error al insertar');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Error al intentar guardar los datos');
-      });
+    console.log(data)
+    //postAPI(URL, data, closeModal, refresh);
   }
 
   return (

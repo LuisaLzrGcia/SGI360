@@ -4,7 +4,8 @@ import AlertView from "../../../Component/Alert/AlertView";
 import getData from "../../../Hooks/getData";
 import { SGIContext } from "../../../Context/SGIContext";
 import SearchSelectView from "../../../Component/SearchSelect/SearchSelectView";
-const API_SGI360 = import.meta.env.VITE_API_DATABASE;
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
+
 
 function NewUser({ arrayProcesses, setDataUsers = "", dataUsers, closeModal, handleRefresh }) {
   const processName = arrayProcesses.map(item => item.name);
@@ -22,7 +23,7 @@ function NewUser({ arrayProcesses, setDataUsers = "", dataUsers, closeModal, han
 
   function saveData() {
     const processFind = arrayProcesses.find(item => item.name === processInput)
-    const URL = `${API_SGI360}/admin/users/setUser.php`;
+    const URL = `${API_SGI360_NODEJS}/user`;
     const data = {
       newUsername: usernameInput.trim(),
       newFirstName: firstNameInput.trim(),
@@ -30,9 +31,8 @@ function NewUser({ arrayProcesses, setDataUsers = "", dataUsers, closeModal, han
       newPassword: passwordInput.trim(),
       newJobTitle: jobTitleInput.trim(),
       newTypeUser: typeUserInput.trim(),
-      newIdProcess: parseInt(processFind.id),
+      newIdProcess: parseInt(processFind.id_process_pk),
     };
-    console.log(URL)
 
     fetch(URL, {
       method: 'POST',
@@ -50,13 +50,11 @@ function NewUser({ arrayProcesses, setDataUsers = "", dataUsers, closeModal, han
         } else {
           console.log('Error al insertar');
         }
-        console.log(result.status)
       })
       .catch(error => {
         console.error('Error:', error);
         alert('Error al intentar guardar los datos');
       });
-    console.log(data)
   }
 
   useEffect(() => {

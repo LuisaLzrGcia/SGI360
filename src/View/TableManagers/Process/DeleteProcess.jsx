@@ -1,27 +1,33 @@
-import React, { useContext, useEffect, useState } from "react";
-import { SGIContext } from "../../../Context/SGIContext";
-import getData from "../../../Hooks/getData";
-const API_SGI360 = import.meta.env.VITE_API_DATABASE;
+import React from "react";
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
 
 const DeleteProcess = ({ data = "", updateData, closeModal }) => {
-  const { id, name, abbreviation } = data;
-
-  const deleteDataUser = async (id) => {
-    const deleteProcess = await getData(
-      `${API_SGI360}/admin/Process/deleteProcess.php?idProcess=${encodeURIComponent(id)}`
-    );
-    return deleteProcess;
-
-  };
+  const { id_process_pk, name, abbreviation } = data;
 
   const handleDelete = async () => {
-    const statusDelete = await deleteDataUser(id);
-    if (statusDelete == 'Successfully') {
-      updateData()
-      closeModal();
-    } else {
-      alert("Error al intentar eliminar usuario");
-    }
+    const URL = `${API_SGI360_NODEJS}/process/${id_process_pk}`;
+    console.log(URL)
+    fetch(URL, {
+      method: 'DELETE',
+      headers: {
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+      .then(response => response.json())
+      .then(result => {
+        if (result.status === 'Successfully') {
+          alert("Datos eliminados");
+          updateData()
+          closeModal();
+        } else {
+          console.log('Error al insertar');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error al intentar eliminar los datos');
+      });
   };
 
   return (
