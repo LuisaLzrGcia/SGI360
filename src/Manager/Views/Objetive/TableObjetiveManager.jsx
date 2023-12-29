@@ -1,7 +1,7 @@
 import { Card } from '@tremor/react'
 import React, { useState, useEffect } from 'react';
 import { Badge, BadgeDelta, Table } from '@tremor/react';
-const API_SGI360 = import.meta.env.VITE_API_DATABASE;
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE; 
 
 import {
   InformationCircleIcon, XCircleIcon, CheckCircleIcon
@@ -9,7 +9,7 @@ import {
 import { fetchDataProcess } from '../../../utils/fetchDataProcess';
 import ModalView from '../../../Component/Modal/ModalView';
 import SearchSelectView from '../../../Component/SearchSelect/SearchSelectView';
-import getData from '../../../Hooks/getData';
+import getDataAPI from "../../../Hooks/getDataAPI";
 import ModifyAchievement from './ModifyAchievement';
 const monthNames = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -17,11 +17,15 @@ const monthNames = [
 ];
 const arrayYears = Array.from({ length: 27 }, (_, index) => (2023 + index).toString());
 
-async function fetchDataObjetive(month, year, process) {
+async function fetchDataObjetive(month, year) {
+  const process = sessionStorage.getItem('process_name')
   try {
-    const URL = `${API_SGI360}/admin/Objetive/getObjetive.php?id_month_fk=${month}&year=${year}&id_process_fk=${process}`;
-    const allData = await getData(URL);
-    console.log(allData);
+    const URL = `${API_SGI360_NODEJS}/objective/${month}/${year}/${encodeURI(process)}`;
+    const allData = await getDataAPI(URL);
+    if (!allData) {
+      console.error("No se encontraron datos");
+      return [];
+    }
     return allData;
   } catch (error) {
     console.error("Error al obtener los datos:", error);

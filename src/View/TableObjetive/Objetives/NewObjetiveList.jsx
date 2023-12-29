@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import SearchSelectView from '../../../Component/SearchSelect/SearchSelectView';
 import { Table } from '@tremor/react';
-const API_SGI360 = import.meta.env.VITE_API_DATABASE;
+import postAPI from "../../../Hooks/postAPI";
+import fetchDataPerspective from "../../../utils/fetchDataPerspective";
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
 
 
 function NewObjetiveList({ closeModal, arrayProcess, arrayYears, handleRefresh = () => { } }) {
@@ -11,6 +13,7 @@ function NewObjetiveList({ closeModal, arrayProcess, arrayYears, handleRefresh =
     const currentDate = new Date();
     const currentYearFind = currentDate.getFullYear();
     const [currentYear, setCurrentYear] = useState(currentYearFind.toString());
+    const [perspectiveData, setPerspectiveData] = useState([]);
 
     const [tableData, setTableData] = useState([]);
     const [isSaveDisabled, setIsSaveDisabled] = useState(true);
@@ -20,12 +23,19 @@ function NewObjetiveList({ closeModal, arrayProcess, arrayYears, handleRefresh =
 
 
     const handleAddRow = () => {
-        const processFind = arrayProcess.find(item => item.name == nameProcessInput)
         const newRow = {
             year: parseInt(currentYear),
             perspective: '',
             application: '',
             objective: '',
+            measurement: '',
+            consult: '',
+            initialValue: '',
+            finalValue: '',
+            date: '',
+            frequency: 'Mensual',
+            who: '',
+            communicate: '',
             expected: ''
         };
         setTableData((prevData) => [...prevData, newRow]);
@@ -45,48 +55,40 @@ function NewObjetiveList({ closeModal, arrayProcess, arrayYears, handleRefresh =
     };
 
     const saveData = async () => {
+        setIsLoading(true);
+        setLoadingMessage("Guardando...");
+
+        const processFind = arrayProcess.find((item) => item.name === nameProcessInput);
+
+        const data = tableData.map((row) => ({
+            perspective: row.perspective,
+            application: row.application.trim(),
+            objective: row.objective.trim(),
+            measurement: row.measurement.trim(),
+            consult: row.consult.trim(),
+            initialValue: row.initialValue.trim(),
+            finalValue: row.finalValue.trim(),
+            date: row.date.trim(),
+            frequency: row.frequency.trim(),
+            who: row.who.trim(),
+            communicate: row.communicate.trim(),
+            expected: row.expected.trim(),
+            year: parseInt(currentYear),
+            idProcess: parseInt(processFind.id_process_pk),
+        }));
+
+        const URL = `${API_SGI360_NODEJS}/objective`;
+        postAPI(URL, data, closeModal, handleRefresh)
+    }
+
+    const getPerspective = async () => {
         try {
-            setIsLoading(true);
-            setLoadingMessage("Guardando...");
-
-            const processFind = arrayProcess.find((item) => item.name === nameProcessInput);
-
-            const dataToSave = tableData.map((row) => ({
-                perspective: row.perspective,
-                application: row.application,
-                objective: row.objective,
-                expected: row.expected,
-                year: parseInt(currentYear),
-                idProcess: parseInt(processFind.id),
-            }));
-
-            const URL = `${API_SGI360}/admin/Objetive/insertObjetive.php`;
-
-            const response = await fetch(URL, {
-                method: 'POST',
-                headers: {
-                    'Content-type': 'application/json',
-                },
-                body: JSON.stringify(dataToSave),
-            });
-
-            const result = await response.json();
-
-            if (result.status === 'Successfully') {
-                alert("Datos guardados");
-                handleRefresh();
-                closeModal();
-            } else {
-                console.log('Error al insertar');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error al intentar guardar los datos');
-        } finally {
-            setIsLoading(false);
-            setLoadingMessage("Guardar objetivos");
+            const data = await fetchDataPerspective()
+            setPerspectiveData(data)
+        } catch (err) {
+            console.log("Error ", err)
         }
-    };
+    }
 
 
     const isAnyInputEmpty = () => {
@@ -100,7 +102,9 @@ function NewObjetiveList({ closeModal, arrayProcess, arrayYears, handleRefresh =
 
     useEffect(() => {
         setIsSaveDisabled(isAnyInputEmpty());
+        getPerspective()
     }, [tableData]);
+
 
     return (
         <>
@@ -152,10 +156,18 @@ function NewObjetiveList({ closeModal, arrayProcess, arrayYears, handleRefresh =
                 <Table className='snap-center'>
                     <thead className="text-black">
                         <tr>
-                            <th><div className="flex item-center justify-center">Perspectiva</div></th>
-                            <th><div className="flex item-center justify-center">Aplicación</div></th>
-                            <th><div className="flex item-center justify-center">Objetivo</div></th>
-                            <th><div className="flex item-center justify-center">Esperado</div></th>
+                            <th><div className="flex item-center justify-center text-center">Perspectiva</div></th>
+                            <th><div className="flex item-center justify-center text-center">Aplicación</div></th>
+                            <th><div className="flex item-center justify-center text-center">Objetivo</div></th>
+                            <th><div className="flex item-center justify-center text-center">Unidad de medida</div></th>
+                            <th><div className="flex item-center justify-center text-center">Consulta</div></th>
+                            <th><div className="flex item-center justify-center text-center">Valor inicial</div></th>
+                            <th><div className="flex item-center justify-center text-center">Valor esperado</div></th>
+                            <th><div className="flex item-center justify-center text-center">Fecha</div></th>
+                            <th><div className="flex item-center justify-center text-center">Frecuencia</div></th>
+                            <th><div className="flex item-center justify-center text-center">Quién</div></th>
+                            <th><div className="flex item-center justify-center text-center">Comunicar</div></th>
+                            <th><div className="flex item-center justify-center text-center">EsperadoXMes</div></th>
                             <th></th>
                         </tr>
                     </thead>
@@ -167,11 +179,12 @@ function NewObjetiveList({ closeModal, arrayProcess, arrayYears, handleRefresh =
                                         placeholder="Seleccione una perspectiva"
                                         select={row.perspective}
                                         setSelectValue={(value) => handleInputChange(index, 'perspective', value)}
-                                        valores={["Calidad", "Financiera", "People", "Seguridad y salud en el trabajo", "Sustentabilidad", "Business and functional performance"]}
+                                        valores={perspectiveData}
                                     />
                                 </td>
                                 <td className='p-1'>
                                     <input
+                                        maxLength={399}
                                         className="w-full px-2 py-1 border rounded-md bg-gray-50 m-1"
                                         type="text"
                                         value={row.application}
@@ -182,6 +195,7 @@ function NewObjetiveList({ closeModal, arrayProcess, arrayYears, handleRefresh =
                                 </td>
                                 <td className='p-1'>
                                     <input
+                                        maxLength={390}
                                         className=" w-full px-2 py-1 border rounded-md bg-gray-50 m-1"
                                         type="text"
                                         value={row.objective}
@@ -192,6 +206,95 @@ function NewObjetiveList({ closeModal, arrayProcess, arrayYears, handleRefresh =
                                 </td>
                                 <td className='p-1'>
                                     <input
+                                        maxLength={99}
+                                        className=" w-full px-2 py-1 border rounded-md bg-gray-50 m-1"
+                                        type="text"
+                                        value={row.measurement}
+                                        onChange={(e) =>
+                                            handleInputChange(index, 'measurement', e.target.value)
+                                        }
+                                    />
+                                </td>
+                                <td className='p-1'>
+                                    <input
+                                        maxLength={99}
+                                        className=" w-full px-2 py-1 border rounded-md bg-gray-50 m-1"
+                                        type="text"
+                                        value={row.consult}
+                                        onChange={(e) =>
+                                            handleInputChange(index, 'consult', e.target.value)
+                                        }
+                                    />
+                                </td>
+                                <td className='p-1'>
+                                    <input
+                                        maxLength={99}
+                                        className=" w-full px-2 py-1 border rounded-md bg-gray-50 m-1"
+                                        type="text"
+                                        value={row.initialValue}
+                                        onChange={(e) =>
+                                            handleInputChange(index, 'initialValue', e.target.value)
+                                        }
+                                    />
+                                </td>
+                                <td className='p-1'>
+                                    <input
+                                        maxLength={99}
+                                        className=" w-full px-2 py-1 border rounded-md bg-gray-50 m-1"
+                                        type="text"
+                                        value={row.finalValue}
+                                        onChange={(e) =>
+                                            handleInputChange(index, 'finalValue', e.target.value)
+                                        }
+                                    />
+                                </td>
+                                <td className='p-1'>
+                                    <input
+                                        maxLength={99}
+                                        className=" w-full px-2 py-1 border rounded-md bg-gray-50 m-1"
+                                        type="text"
+                                        value={row.date}
+                                        onChange={(e) =>
+                                            handleInputChange(index, 'date', e.target.value)
+                                        }
+                                    />
+                                </td>
+                                <td className='p-1'>
+                                    <input
+                                        maxLength={99}
+                                        className=" w-full px-2 py-1 border rounded-md bg-gray-50 m-1"
+                                        type="text"
+                                        value={row.frequency}
+                                        onChange={(e) =>
+                                            handleInputChange(index, 'frequency', e.target.value)
+                                        }
+                                    />
+                                </td>
+                                <td className='p-1'>
+                                    <input
+                                        maxLength={99}
+                                        className=" w-full px-2 py-1 border rounded-md bg-gray-50 m-1"
+                                        type="text"
+                                        value={row.who}
+                                        onChange={(e) =>
+                                            handleInputChange(index, 'who', e.target.value)
+                                        }
+                                    />
+                                </td>
+                                <td className='p-1'>
+                                    <input
+                                        maxLength={99}
+                                        className=" w-full px-2 py-1 border rounded-md bg-gray-50 m-1"
+                                        type="text"
+                                        value={row.communicate}
+                                        onChange={(e) =>
+                                            handleInputChange(index, 'communicate', e.target.value)
+                                        }
+                                    />
+                                </td>
+                                <td className='p-1'>
+                                    <input
+                                        maxLength={99}
                                         className=" w-full px-2 py-1 border rounded-md bg-gray-50 m-1"
                                         type="text"
                                         value={row.expected}
@@ -207,7 +310,6 @@ function NewObjetiveList({ closeModal, arrayProcess, arrayYears, handleRefresh =
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.375-6.375a1.125 1.125 0 010-1.59L9.42 4.83c.211-.211.498-.33.796-.33H19.5a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25h-9.284c-.298 0-.585-.119-.796-.33z" />
                                         </svg>
-
                                     </button>
                                 </td>
                             </tr>

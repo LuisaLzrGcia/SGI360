@@ -4,6 +4,12 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import Login from './View/Login/Login';
 import LayoutMain from './Layout/LayoutMain/LayoutMain';
 import LayoutMainManager from './Manager/LayoutMainManager';
+import TableCurrentByProcess from './View/TableObjetive/Achievement/TableCurrentByProcess';
+import TableByProcess from './View/TableObjetive/Achievement/TableByProcess';
+import NewSAC from './View/TableSAC/SAC/NewSAC';
+import TableSACView from './View/TableSAC/SAC/TableSACView';
+import TableObjetiveView from './View/TableObjetive/TableObjetiveView';
+import TableObjetiveListView from './View/TableObjetive/Objetives/TableObjetiveListView';
 
 function App() {
   const isLogin = sessionStorage.getItem("id_user_pk");

@@ -1,23 +1,23 @@
 import React, { useContext, useState } from 'react'
-import DashboardGralManager from './Views/DashboardGralManager';
 import NavbarView from '../Layout/Navbar/NavbarView';
 import SidebarViewManager from './Views/Sidebar/SidebarViewManager';
 import TableObjetiveManager from './Views/Objetive/TableObjetiveManager';
 import TableDocumentsManager from './Views/Documents/TableDocumentsManager';
-import TableSACManager from './Views/SAC/TableSACManager';
 import DashboardGralView from '../Layout/Dashboards/DashboardGralView';
+import TableSacView from './Views/SAC/TableView';
+import TableSACManager from './Views/SAC/TableSACManager';
 
 function LayoutMainManager() {
     const [selectedComponent, setSelectedComponent] = useState('dashboard');
     const renderSelectedComponent = () => {
         switch (selectedComponent) {
             case 'dashboard':
-                return <DashboardGralView/>;
+                return <DashboardGralView />;
             case 'documents':
                 return <TableDocumentsManager />
             case 'objetive':
                 return <TableObjetiveManager />
-                case 'sac':
+            case 'sac':
                 return <TableSACManager />
             default:
                 return null;

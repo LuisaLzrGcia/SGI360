@@ -1,4 +1,8 @@
-export default function deleteAPI(URL, closeModal, refresh) {
+export default function deleteAPI(
+  URL,
+  closeModal = () => {},
+  refresh = () => {}
+) {
   fetch(URL, {
     method: "DELETE",
     headers: {

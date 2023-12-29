@@ -14,9 +14,7 @@ async function fetchDataDocuments() {
   try {
     const data = await getDataAPI(`${API_SGI360_NODEJS}/documents`);
     const formattedData = data.map((document) => {
-      console.log(document.issuance_date)
       const issuanceDateFormated = getDateSQLFormated(document.issuance_date)
-      console.log(issuanceDateFormated)
       const effectiveDateFormated = getDateSQLFormated(document.effective_date)
       return {
         ...document,
@@ -172,7 +170,7 @@ export default function TableDocumentsView() {
 
         filteredData = filteredData.filter(item =>
           item.code.includes(codeSearch) &&
-          (processSearch === "Todo" || item.process.includes(processSearch))
+          (processSearch === "Todo" || item.process_name.includes(processSearch))
         );
         filteredData.sort((a, b) => a.code.localeCompare(b))
         setData(filteredData);

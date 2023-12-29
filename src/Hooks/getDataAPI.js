@@ -11,7 +11,6 @@ async function dataAPI(URL, method = "GET", body = null) {
       if (body) {
         options.body = JSON.stringify(body);
       }
-  
       const response = await fetch(URL, options);
   
       if (!response.ok) {

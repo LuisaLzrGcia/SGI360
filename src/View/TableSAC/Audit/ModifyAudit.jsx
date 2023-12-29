@@ -90,6 +90,7 @@ function ModifyAudit({ item, handleRefresh = () => { }, closeModal, standarArray
         />
         <div>Código</div>
         <input
+          maxLength={95}
           type="text"
           value={codeInput}
           onChange={(event) => setCodeInput(event.target.value)}
@@ -97,6 +98,7 @@ function ModifyAudit({ item, handleRefresh = () => { }, closeModal, standarArray
         />
         <div>Descripción</div>
         <textarea
+          maxLength={295}
           cols="5" rows=""
           value={descriptionInput}
           onChange={(event) => setDescriptionInput(event.target.value)}

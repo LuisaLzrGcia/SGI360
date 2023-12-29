@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import SearchSelectView from "../../../Component/SearchSelect/SearchSelectView";
-import { DatePicker } from "@tremor/react";
+import { DatePicker, DateRangePicker } from "@tremor/react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import getDataAPI from '../../../Hooks/getDataAPI';
@@ -23,12 +23,11 @@ function NewAudit({ handleRefresh = () => { }, closeModal }) {
   const [codeInput, setCodeInput] = useState("");
   const [standarInput, setStandarInput] = useState("");
   const [descriptionInput, setDescriptionInput] = useState("");
-  const [startDateInput, setStartDateInput] = useState("");
-  const [finishDateInput, setFinishDateInput] = useState("");
+  const [startDateInput, setStartDateInput] = useState(dateCurrent);
+  const [finishDateInput, setFinishDateInput] = useState(dateCurrent);
   const [typeInput, setTypeInput] = useState("");
 
   function saveData() {
-
     const fechaFormateadaInicio = format(startDateInput, "yyyy-MM-dd");
     const fechaFormateadaCierre = format(finishDateInput, "yyyy-MM-dd");
     const standarFind = standarArray.find(item => item.name === standarInput)
@@ -48,8 +47,8 @@ function NewAudit({ handleRefresh = () => { }, closeModal }) {
 
   const isEmpty =
     codeInput.trim() == "" ||
-    startDateInput == "" ||
-    finishDateInput == "" ||
+    startDateInput == null ||
+    finishDateInput == null ||
     standarInput.trim() == "" ||
     typeInput.trim() == "" ||
     descriptionInput.trim() == "";
@@ -78,9 +77,11 @@ function NewAudit({ handleRefresh = () => { }, closeModal }) {
         />
         <div>Fecha de cierre</div>
         <DatePicker
+          className="max-w-sm mx-auto"
           locale={es}
           placeholder="Selecione un fecha de cierre"
           onValueChange={setFinishDateInput}
+          value={finishDateInput}
         />
         <div>Tipo</div>
         <SearchSelectView
@@ -98,6 +99,7 @@ function NewAudit({ handleRefresh = () => { }, closeModal }) {
         />
         <div>Código</div>
         <input
+          maxLength={95}
           type="text"
           value={codeInput}
           onChange={(event) => setCodeInput(event.target.value)}
@@ -105,6 +107,7 @@ function NewAudit({ handleRefresh = () => { }, closeModal }) {
         />
         <div>Descripción</div>
         <textarea
+          maxLength={295}
           cols="5" rows=""
           value={descriptionInput}
           onChange={(event) => setDescriptionInput(event.target.value)}

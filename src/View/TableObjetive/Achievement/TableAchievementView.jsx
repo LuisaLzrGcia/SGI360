@@ -3,14 +3,15 @@ import { fetchDataProcess } from '../../../utils/fetchDataProcess';
 import { Badge, BadgeDelta, Table } from '@tremor/react';
 import SearchSelectView from '../../../Component/SearchSelect/SearchSelectView';
 import ModalView from '../../../Component/Modal/ModalView';
-import getData from '../../../Hooks/getData';
-const API_SGI360 = import.meta.env.VITE_API_DATABASE;
+import getDataAPI from "../../../Hooks/getDataAPI";
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
 
 import {
   InformationCircleIcon, XCircleIcon, CheckCircleIcon
 } from "@heroicons/react/outline";
 import ModifyObjetiveList from './ModifyAchievement';
 import ModifyAchievement from './ModifyAchievement';
+import TableByProcess from './TableByProcess';
 const monthNames = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
@@ -19,8 +20,12 @@ const arrayYears = Array.from({ length: 27 }, (_, index) => (2023 + index).toStr
 
 async function fetchDataObjetive(month, year, process) {
   try {
-    const URL = `${API_SGI360}/admin/Objetive/getObjetive.php?id_month_fk=${month}&year=${year}&id_process_fk=${process}`;
-    const allData = await getData(URL);
+    const URL = `${API_SGI360_NODEJS}/objective/${month}/${year}/${process}`;
+    const allData = await getDataAPI(URL);
+    if (!allData) {
+      console.error("No se encontraron datos");
+      return [];
+    }
     return allData;
   } catch (error) {
     console.error("Error al obtener los datos:", error);
@@ -50,12 +55,12 @@ function TableAchievementView() {
     fetchDataForObjetive()
   }
 
-  // const handleNew = () => {
-  //   setAction('new');
-  //   const newProcessComponent = <NewObjetiveList closeModal={closeModal} arrayProcess={dataProcess} arrayYears={arrayYears} handleRefresh={handleRefresh} />;
-  //   setComponet(newProcessComponent);
-  //   openModal();
-  // }
+  const handleTable = () => {
+    setAction('table');
+    const tableComponent = <TableByProcess />;
+    setComponet(tableComponent);
+    openModal();
+  }
 
   const handleModify = (item) => {
     setAction('modify');
@@ -80,14 +85,13 @@ function TableAchievementView() {
     if (nameProcessInput != undefined && currentMonth != "" && currentYear != "") {
       const processFind = dataProcess.find(item => item.name == nameProcessInput);
       if (processFind) {
-        const processId = processFind.id;
         const monthId = monthNames.indexOf(currentMonth);
         try {
-          const data = await fetchDataObjetive((monthId + 1), currentYear, processId);
+          const data = await fetchDataObjetive((monthId + 1), currentYear, nameProcessInput);
           setDataTable(data);
         } catch (error) {
-          console.error("Error al obtener los datos del objetivo:", error);
-          setDataTable([]); // Manejar el caso de error estableciendo un array vacío o algún valor predeterminado
+          alert("Error al obtener los datos del objetivo:", error);
+          setDataTable([]);
         }
       }
     }
@@ -111,10 +115,10 @@ function TableAchievementView() {
       {
         (() => {
           switch (action) {
-            // case 'new':
-            //   return (
-            //     <ModalView openModal={openModal} closeModal={closeModal} isOpen={isOpen} componentReact={componet} title={"Registrar nuevos objetivos"} sizeModal={"w-full"} sizeModalMax={"max-w-6xl"} />
-            //   );
+            case 'table':
+              return (
+                <ModalView openModal={openModal} closeModal={closeModal} isOpen={isOpen} componentReact={componet} title={"Objetivos por proceso"} sizeModal={"w-full"} sizeModalMax={"max-w-7xl"} />
+              );
             case 'modify':
               return (
                 <ModalView openModal={openModal} closeModal={closeModal} isOpen={isOpen} componentReact={componet} title={"Modificar cumplimiento"} sizeModal={""} sizeModalMax={""} />
@@ -140,7 +144,7 @@ function TableAchievementView() {
             />
           </div>
           <div className='m-2'>
-          <span className='text-sm font-semibold' >Mes</span>
+            <span className='text-sm font-semibold' >Mes</span>
             <SearchSelectView
               placeholder="Seleccione un mes"
               select={currentMonth}
@@ -149,7 +153,7 @@ function TableAchievementView() {
             />
           </div>
           <div className='m-2'>
-          <span className='text-sm font-semibold' >Año</span>
+            <span className='text-sm font-semibold' >Año</span>
             <SearchSelectView
               placeholder="Seleccione un año"
               select={currentYear}
@@ -161,9 +165,16 @@ function TableAchievementView() {
         <div className='flex items-center justify-center m-2'>
           <button
             onClick={handleRefresh}
-            className="rounded-md bg-slate-700 p-2 text-white text-sm">
+            className="mx-1 rounded-md bg-slate-700 p-2 text-white text-sm">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>
+          </button>
+          <button
+            onClick={handleTable}
+            className="mx-1 rounded-md bg-slate-700 p-2 text-white text-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 01-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0112 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 1.5v-1.5m0 0c0-.621.504-1.125 1.125-1.125m0 0h7.5" />
             </svg>
           </button>
         </div>
@@ -214,7 +225,7 @@ function TableAchievementView() {
         </thead>
         <tbody className="text-md text-black">
           {dataTable.map((item, index) => (
-            <tr className={`border-t border-slate-400 ${index % 2 == 0 ? 'bg-slate-100' : ''}`} key={index}>
+            <tr key={index} className={`border-t border-slate-400 ${index % 2 == 0 ? 'bg-slate-100' : ''}`}>
               <td className="">
                 <div className="flex item-center justify-center mx-1">
                   {item.perspective}

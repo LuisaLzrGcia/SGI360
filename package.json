@@ -16,10 +16,20 @@
     "@mui/material": "^5.14.12",
     "@tremor/react": "^3.9.2",
     "date-fns": "^2.30.0",
+    "file-saver": "^2.0.5",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.1",
     "jwt-decode": "^3.1.2",
+    "pdf-node": "^1.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.14.2"
+    "react-easy-export": "^1.0.1",
+    "react-export-table-to-excel": "^1.0.6",
+    "react-icons": "^4.12.0",
+    "react-router-dom": "^6.14.2",
+    "xlsx": "^0.18.5",
+    "xlsx-style": "^0.8.13"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import postAPI from "../../../Hooks/postAPI";
 const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
 
 
@@ -9,30 +10,11 @@ function NewProcess({ setData = "", closeModal, updateData }) {
     const URL = `${API_SGI360_NODEJS}/process`;
     const data = {
       newNameProcess: nameInput,
-      newAbbreviation: abbreviationInput
+      newAbbreviation: abbreviationInput,
+      newPowerBI: "NULL"
     };
 
-    fetch(URL, {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-      .then(response => response.json())
-      .then(result => {
-        if (result.status === 'Successfully') {
-          alert("Datos guardados");
-          updateData()
-          closeModal();
-        } else {
-          console.log('Error al insertar');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Error al intentar guardar los datos');
-      });
+    postAPI(URL, data, closeModal, updateData)
   }
 
 
@@ -41,6 +23,7 @@ function NewProcess({ setData = "", closeModal, updateData }) {
       <div className="grid grid-cols-1 mt-3">
         <div>Nombre del proceso</div>
         <input
+          maxLength={195}
           type="text"
           value={nameInput}
           onChange={(event) => setNameInput(event.target.value)}
@@ -48,6 +31,7 @@ function NewProcess({ setData = "", closeModal, updateData }) {
         />
         <div>Abreviación</div>
         <input
+          maxLength={95}
           value={abbreviationInput}
           onChange={(event) => setAbbreviationInput(event.target.value)}
           className="px-2 py-1 border rounded-md bg-gray-50"

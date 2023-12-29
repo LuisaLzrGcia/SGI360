@@ -1,4 +1,9 @@
-export default function putApi(URL, data, closeModal, refresh) {
+export default function putApi(
+  URL,
+  data,
+  closeModal = () => {},
+  refresh = () => {}
+) {
   fetch(URL, {
     method: "PUT",
     headers: {

@@ -3,16 +3,32 @@ import React, { useEffect, useState } from 'react'
 import getData from '../../../Hooks/getData';
 import SearchSelectView from '../../../Component/SearchSelect/SearchSelectView';
 import { ExclamationCircleIcon, StatusOnlineIcon } from "@heroicons/react/solid";
-const API_SGI360 = import.meta.env.VITE_API_DATABASE;
+import { getDateSQLFormated } from '../../../Hooks/dateSQLFormated'
+import getDataAPI from '../../../Hooks/getDataAPI';
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
 
-async function fetchDataDocument(parametros) {
-  try {
-    const URL = `${API_SGI360}/manager/getDocumentsManager.php?${parametros}`;
-    const allData = await getData(URL);
-    return allData;
-  } catch (error) {
-    console.error("Error al obtener los datos:", error);
-    return [];
+async function fetchDataDocument(type, status) {
+  const processName = sessionStorage.getItem('process_name')
+  if (type != '' && status != '') {
+    try {
+      const URL = `${API_SGI360_NODEJS}/documents/${encodeURI(processName)}/${encodeURI(type)}/${encodeURI(status)}`;
+      const allData = await getDataAPI(URL, "GET", null);
+      const formattedData = allData.map((document) => {
+        const issuanceDateFormated = getDateSQLFormated(document.issuance_date)
+        const effectiveDateFormated = getDateSQLFormated(document.effective_date)
+        return {
+          ...document,
+          issuance_date_formated: issuanceDateFormated,
+          effective_date_formated: effectiveDateFormated,
+        };
+      });
+      return formattedData;
+    } catch (error) {
+      console.error("Error al obtener los datos:", error);
+      return [];
+    }
+  } else {
+    return []
   }
 }
 
@@ -24,9 +40,7 @@ function TableDocumentsManager() {
 
   const fetchDocuments = async () => {
     try {
-      const processName = sessionStorage.getItem('process_name')
-      const parametros = `process_name=${processName}&type=${typeInput}&status=${statusInput}`
-      const data = await fetchDataDocument(parametros)
+      const data = await fetchDataDocument(typeInput, statusInput)
       setDataTable(data);
     } catch (error) {
       console.error("Error al obtener los datos:", error);
@@ -116,31 +130,31 @@ function TableDocumentsManager() {
                   </td>
                   <td className="">
                     <div className="flex item-center justify-center mx-1">
-                      {item.issuance_date}
+                      {item.effective_date_formated}
                     </div>
                   </td>
                   <td className="">
                     <div className="flex item-center justify-center mx-1">
                       {
-                          (() => {
-                            switch (item.status) {
-                              case 'Vigente':
-                                return (
-                                  <Badge color="emerald" size="xs" icon={StatusOnlineIcon}>{item.status}</Badge>
-                                );
-                              case 'Vencido':
-                                return (
-                                  <Badge color="red" size="xs" icon={ExclamationCircleIcon}>{item.status}</Badge>
-                                );
-                              case 'Por vencer':
-                                return (
-                                  <Badge color="yellow" size="xs" icon={ExclamationCircleIcon}>{item.status}</Badge>
-                                );
-                              default:
-                                return null;
-                            }
-                          })()
-                        }
+                        (() => {
+                          switch (item.status) {
+                            case 'Vigente':
+                              return (
+                                <Badge color="emerald" size="xs" icon={StatusOnlineIcon}>{item.status}</Badge>
+                              );
+                            case 'Vencido':
+                              return (
+                                <Badge color="red" size="xs" icon={ExclamationCircleIcon}>{item.status}</Badge>
+                              );
+                            case 'Por vencer':
+                              return (
+                                <Badge color="yellow" size="xs" icon={ExclamationCircleIcon}>{item.status}</Badge>
+                              );
+                            default:
+                              return null;
+                          }
+                        })()
+                      }
                     </div>
                   </td>
                 </tr>

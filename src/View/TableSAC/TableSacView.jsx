@@ -7,10 +7,11 @@ import {
   TabPanels,
   TabPanel,
 } from "@tremor/react";
-import { DocumentTextIcon, ViewListIcon, DocumentReportIcon, ClipboardCheckIcon } from "@heroicons/react/solid";
+import { DocumentTextIcon, DocumentIcon, DocumentReportIcon, ClipboardCheckIcon, CheckCircleIcon } from "@heroicons/react/solid";
 import TableStandarView from "./Standar/TableStandarView";
 import TableAuditView from "./Audit/TableAuditView";
 import TableSACView from "./SAC/TableSACView";
+import TableACView from './AC/TableACView';
 
 
 function TableSacView() {
@@ -19,6 +20,9 @@ function TableSacView() {
       <div className="mx-3 mb-10">
         <TabGroup>
           <TabList className="mt-3">
+            <Tab className="text-lg" icon={CheckCircleIcon}>
+              AC
+            </Tab>
             <Tab className="text-lg" icon={DocumentTextIcon}>
               SAC
             </Tab>
@@ -30,7 +34,12 @@ function TableSacView() {
             </Tab>
           </TabList>
           <TabPanels>
-            <TabPanel className="">
+            <TabPanel>
+              <Card>
+                <TableACView />
+              </Card>
+            </TabPanel>
+            <TabPanel>
               <Card>
                 <TableSACView />
               </Card>

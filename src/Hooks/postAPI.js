@@ -1,4 +1,9 @@
-export default function postAPI(URL, data, closeModal, refresh) {
+export default function postAPI(
+  URL,
+  data,
+  closeModal = () => {},
+  refresh = () => {}
+) {
   fetch(URL, {
     method: "POST",
     headers: {
@@ -13,7 +18,7 @@ export default function postAPI(URL, data, closeModal, refresh) {
         closeModal();
         refresh();
       } else {
-        console.log("Error al insertar");
+        alert("Error al insertar");
       }
     })
     .catch((error) => {

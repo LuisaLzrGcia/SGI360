@@ -14,7 +14,6 @@ function Login() {
         const formData = Object.fromEntries(form)
         const { username, password } = formData;
         const data = await loginUser(username, password);
-        console.log(data)
         if (data != null) {
             setFound(false)
             getAuth(data)

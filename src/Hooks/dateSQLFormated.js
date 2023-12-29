@@ -21,4 +21,4 @@ function setDateSQLFormated(dateSQL) {
   return `${year}-${month}-${day}`;
 }
 
-export { getDateSQLFormated, setDateSQLFormated };
+export { getDateSQLFormated, setDateSQLFormated, pad };

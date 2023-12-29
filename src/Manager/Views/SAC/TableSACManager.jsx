@@ -1,29 +1,15 @@
-import { Card } from '@tremor/react'
 import React, { useEffect, useState } from 'react';
-import getData from '../../../Hooks/getData';
-import { Badge, Table } from '@tremor/react';
+import { Badge, Card, Table } from '@tremor/react';
 import SearchSelectView from '../../../Component/SearchSelect/SearchSelectView';
 import { fetchDataProcess } from '../../../utils/fetchDataProcess';
 import { StatusOnlineIcon, CheckCircleIcon } from '@heroicons/react/solid';
-
-
-const API_SGI360 = import.meta.env.VITE_API_DATABASE;
-
-async function fetchDataSAC(parametros) {
-  try {
-    const URL = `${API_SGI360}/admin/SAC/getSAC.php?${parametros}`;
-    console.log(URL)
-    const allData = await getData(URL);
-    return allData;
-  } catch (error) {
-    console.error("Error al obtener los datos:", error);
-    return [];
-  }
-}
+import getDataAPI from '../../../Hooks/getDataAPI';
+import TableView from './TableView';
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
 
 async function fetchDataStandars() {
   try {
-    const all = await getData(`${API_SGI360}/admin/Standar/getStandars.php`);
+    const all = await getDataAPI(`${API_SGI360_NODEJS}/standar`);
     return all;
   } catch (error) {
     console.error("Error al obtener los datos:", error);
@@ -31,13 +17,15 @@ async function fetchDataStandars() {
   }
 }
 
-async function fetchDataCode(standar) {
-  try {
-    const all = await getData(`${API_SGI360}/admin/audit/getCodeAudit.php?standar=${standar}`);
-    return all;
-  } catch (error) {
-    console.error("Error al obtener los datos:", error);
-    return [];
+async function fetchDataCode(standar, year) {
+  if (standar != '' && year != '') {
+    try {
+      const all = await getDataAPI(`${API_SGI360_NODEJS}/audit/standar/${encodeURI(standar)}/${year}`);
+      return all;
+    } catch (error) {
+      console.error("Error al obtener los datos:", error);
+      return [];
+    }
   }
 }
 
@@ -66,18 +54,28 @@ function TableSACManager() {
 
   const [statusInput, setStatusInput] = useState('Todos')
 
-
   const handleRefresh = async () => {
     fetchSAC()
   }
 
   const fetchSAC = async () => {
-    const processName = sessionStorage.getItem('process_name');
-    const parametros = `standar=${encodeURIComponent(standarInput)}&code=${encodeURIComponent(codeInput)}&process_name=${encodeURIComponent(processName)}&year=${encodeURIComponent(yearInput)}&status=${encodeURIComponent(statusInput)}`
-    const allData = await fetchDataSAC(parametros);
-    console.log(allData)
-    setDataTable(allData)
+    const processName = sessionStorage.getItem('process_name')
+    try {
+      const data = {
+        standar: standarInput,
+        code: codeInput,
+        year: yearInput,
+        status: statusInput,
+        process: processName
+      };
+      const URL = `${API_SGI360_NODEJS}/sac/filter`;
+      const dataSAC = await getDataAPI(URL, "POST", data);
+      setDataTable(dataSAC);
+    } catch (error) {
+      console.error("Error al obtener los datos:", error);
+    }
   };
+
   const fetchDataStandar = async () => {
     const allData = await fetchDataStandars();
     const namesStandar = allData.map(item => item.name);
@@ -86,10 +84,14 @@ function TableSACManager() {
   };
 
   const fetchCode = async (value) => {
-    const allData = await fetchDataCode(value);
-    setcodeArray(allData)
-    const code = allData.map(item => item.audit_code);
-    setCodeAudit(code)
+    if (value !== '' && value !== null) {
+      const allData = await fetchDataCode(value, yearInput);
+      setcodeArray(allData);
+      const code = allData.map(item => item.audit_code);
+      setCodeAudit(code);
+    } else {
+      setCodeAudit([]);
+    }
   };
   const fetchProcess = async () => {
     try {
@@ -104,11 +106,12 @@ function TableSACManager() {
 
   useEffect(() => {
     fetchDataStandar();
-    fetchSAC();
-    fetchCode(standarInput)
+    if (standarInput !== '' || yearInput !== '') {
+      fetchCode(standarInput)
+      fetchSAC();
+    }
     fetchProcess()
-  }, [standarInput, codeInput, yearInput, statusInput]);
-
+  }, [standarInput, codeInput, processInput, yearInput, statusInput]);
   return (
     <>
       <div className='m-3'>
@@ -165,75 +168,55 @@ function TableSACManager() {
           <div className='pb-5 text-sm'>
             Resultados totales: <span className='font-semibold'>{dataTable.length}</span>
           </div>
-          <Table>
-            <thead className="text-black">
-              <tr>
-                <th>
-                  <div className="flex item-center justify-center">
-                    Estándar
-                  </div>
-                </th>
-                <th>
-                  <div className="flex item-center justify-center">
-                    Auditoría
-                  </div>
-                </th>
-                <th>
-                  <div className="flex item-center justify-center">
-                    Proceso
-                  </div>
-                </th>
-                <th>
-                  <div className="flex item-center justify-center">
-                    Estado
-                  </div>
-                </th>
-                <th>
-                  <div className="flex item-center justify-center">
-                    Descripción
-                  </div>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="text-md text-black">
-              {dataTable.map((item, index) => (
-                <tr className={`border-t border-slate-400 ${index % 2 == 0 ? 'bg-slate-100' : ''}`} key={index}>
-                  <td className="">
+          {dataTable.length > 0 ? (
+            <TableView dataTable={dataTable}/>
+          ) : (
+            <Table>
+              <thead className="text-black">
+                <tr>
+                  <th>
                     <div className="flex item-center justify-center">
-                      {item.standar_name}
+                      Estándar
                     </div>
-                  </td>
-                  <td className="">
-                    <div className="flex item-center justify-center ">
-                      {item.code}
+                  </th>
+                  <th>
+                    <div className="flex item-center justify-center">
+                      Auditoría
                     </div>
-                  </td>
-                  <td className="">
-                    <div className="flex item-center justify-center ">
-                      {item.process_name}
+                  </th>
+                  <th>
+                    <div className="flex item-center justify-center">
+                      Proceso
                     </div>
-                  </td>
-
-                  <td className="">
-                    <div className="flex item-center justify-center p-1">
-                      {item.sac_status === 'Abierta' ?
-                        <Badge icon={StatusOnlineIcon} color={'teal'}>{item.sac_status}</Badge>
-                        :
-                        <Badge icon={CheckCircleIcon} color={'rose'}>{item.sac_status}</Badge>}
+                  </th>
+                  <th>
+                    <div className="flex item-center justify-center">
+                      Estado
                     </div>
-                  </td>
-                  <td className="">
-                    <div className="flex item-center justify-center ">
-                      {item.sac_description}                                </div>
-                  </td>
+                  </th>
+                  <th>
+                    <div className="flex item-center justify-center">
+                      Descripción
+                    </div>
+                  </th>
+                  <th></th>
+                  <th>
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </Table>
+              </thead>
+              <tbody className="text-md text-black">
+                <tr>
+                  <th colSpan={6} className='text-center text-3xl p-3'>
+                    NO HAY RESULTADOS
+                  </th>
+                </tr>
+              </tbody>
+            </Table>
+          )}
         </Card>
       </div>
     </>
   )
 }
 
-export default TableSACManager
+export default TableSACManager;

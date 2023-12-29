@@ -1,7 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
-import { SGIContext } from "../../../Context/SGIContext";
-import getData from "../../../Hooks/getData";
-const API_SGI360 = import.meta.env.VITE_API_DATABASE;
+import React from "react";
 const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
 
 

@@ -4,16 +4,17 @@ import ModalView from '../../../Component/Modal/ModalView';
 import SearchSelectView from '../../../Component/SearchSelect/SearchSelectView';
 import { fetchDataProcess } from '../../../utils/fetchDataProcess';
 import { StatusOnlineIcon, CheckCircleIcon } from '@heroicons/react/solid';
-import NewSAC from './NewSAC';
-import DeleteSAC from './DeleteSAC';
-import ModifySAC from './ModifySAC';
 import getDataAPI from '../../../Hooks/getDataAPI';
-import TableACbySACView from '../AC/TableACbySACView';
+import ModifyAC from './ModifyAC';
+import DeleteAC from './DeleteAC';
+import NewAC from './NewAC';
 const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
+
 
 async function fetchDataStandars() {
     try {
-        const all = await getDataAPI(`${API_SGI360_NODEJS}/standar`);
+        const URL = `${API_SGI360_NODEJS}/standar`;
+        const all = await getDataAPI(URL);
         return all;
     } catch (error) {
         console.error("Error al obtener los datos:", error);
@@ -24,7 +25,8 @@ async function fetchDataStandars() {
 async function fetchDataCode(standar, year) {
     if (standar != '' && year != '') {
         try {
-            const all = await getDataAPI(`${API_SGI360_NODEJS}/audit/standar/${encodeURI(standar)}/${year}`);
+            const URL = `${API_SGI360_NODEJS}/audit/standar/${encodeURI(standar)}/${year}`;
+            const all = await getDataAPI(URL);
             return all;
         } catch (error) {
             console.error("Error al obtener los datos:", error);
@@ -33,6 +35,18 @@ async function fetchDataCode(standar, year) {
     }
 }
 
+async function fetchACCode(value) {
+    if (value != '') {
+        try {
+            const url = `${API_SGI360_NODEJS}/sac/${encodeURI(value)}`
+            const all = await getDataAPI(url);
+            return all;
+        } catch (error) {
+            console.error("Error al obtener los datos:", error);
+            return [];
+        }
+    }
+}
 async function fetchAC(audit, sac) {
     if (audit != '' && sac != '') {
         try {
@@ -47,7 +61,8 @@ async function fetchAC(audit, sac) {
         return []
     }
 }
-function TableSACView() {
+
+function TableACView() {
     const [dataTable, setDataTable] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const [componet, setComponet] = useState("");
@@ -71,70 +86,55 @@ function TableSACView() {
     const [yearInput, setYearInput] = useState(currentYearFind)
 
     const [statusInput, setStatusInput] = useState('Todos')
+    const [sacArray, setSacArray] = useState([])
+    const [sacInput, setSacInput] = useState("Todos")
 
     const closeModal = () => setIsOpen(false);
     const openModal = () => { setIsOpen(true) };
 
     const handleRefresh = async () => {
-        fetchSAC()
+        if (standarInput === '' || yearInput === '') {
+            setDataTable([]);
+            setCodeAudit([])
+            setSacArray([])
+        } else {
+            getCodes(standarInput, yearInput);
+            if (codeInput === '') {
+                setDataTable([]);
+                setCodeAudit([])
+                setSacArray([])
+            } else {
+                if (codeInput !== '') {
+                    getSACCode(codeInput);
+                }
+            }
+        }
     }
 
     const handleNew = () => {
         setAction('new');
-        const component = <NewSAC handleRefresh={handleRefresh} closeModal={closeModal}
-            standarArray={standarArray} getCodes={getCodes}
-            processArray={processArray} processName={processName} />;
+        const component = <NewAC handleRefresh={handleRefresh} closeModal={closeModal}
+            standarArray={standarArray} getCodes={fetchDataCode}
+            fetchACCode={fetchACCode} />;
         setComponet(component);
         openModal();
     }
 
     const handleModify = ({ item }) => {
         setAction('modify');
-        const component = <ModifySAC item={item} handleRefresh={handleRefresh} closeModal={closeModal}
-            standarArray={standarArray} getCodes={getCodes}
-            processArray={processArray} processName={processName} />;
+        const component = <ModifyAC item={item} handleRefresh={handleRefresh} closeModal={closeModal}
+            standarArray={standarArray} getCodes={fetchDataCode}
+            fetchACCode={fetchACCode} />;
         setComponet(component);
         openModal();
     }
 
     const handleDelete = ({ item }) => {
         setAction('delete');
-        const component = <DeleteSAC item={item} handleRefresh={handleRefresh} closeModal={closeModal} />;
+        const component = <DeleteAC item={item} handleRefresh={handleRefresh} closeModal={closeModal} />;
         setComponet(component);
         openModal();
     }
-
-    const handleAC = async (audit = "", sac = "") => {
-        if (audit == "" || sac == "") {
-        } else {
-            try {
-                const data = await fetchAC(audit, sac);
-                setAction('ac');
-                const component = <TableACbySACView dataTable={data} />;
-                setComponet(component);
-                openModal();
-            } catch (error) {
-                console.error("Error al obtener los datos:", error);
-            }
-        }
-    }
-
-    const fetchSAC = async () => {
-        try {
-            const data = {
-                standar: standarInput,
-                code: codeInput,
-                process: processInput,
-                year: yearInput,
-                status: statusInput
-            };
-            const URL = `${API_SGI360_NODEJS}/sac/filter`;
-            const dataSAC = await getDataAPI(URL, "POST", data);
-            setDataTable(dataSAC);
-        } catch (error) {
-            console.error("Error al obtener los datos:", error);
-        }
-    };
 
     const fetchDataStandar = async () => {
         const allData = await fetchDataStandars();
@@ -143,41 +143,56 @@ function TableSACView() {
         setStandarNames(namesStandar)
     };
 
-    const getCodes = async (value) => {
-        const allData = await fetchDataCode(value, yearInput);
-        return allData
+    const getCodes = async (value, year) => {
+        await fetchCode(value, year);
     }
 
-    const fetchCode = async (value) => {
+    const fetchCode = async (value, year) => {
         if (value !== '' && value !== null) {
-            const allData = await fetchDataCode(value, yearInput);
-            setcodeArray(allData);
-            const code = allData.map(item => item.audit_code);
-            setCodeAudit(code);
+            if (year !== '' && year !== null) {
+                const allData = await fetchDataCode(value, year);
+                setcodeArray(allData);
+                const code = allData.map(item => item.audit_code);
+                setCodeAudit(code);
+            } else {
+                setcodeArray([]);
+                setCodeAudit([]);
+                setDataTable([])
+            }
         } else {
             setCodeAudit([]);
         }
     };
 
-    const fetchProcess = async () => {
+
+    const getSACCode = async (value) => {
         try {
-            const processData = await fetchDataProcess();
-            setProcessArray(processData)
-            const nameProcess = processData.map(item => item.name);
-            setProcessName(nameProcess)
+            const allData = await fetchACCode(value);
+            const sacCodes = allData.map(item => item.sac_code);
+            setSacArray(sacCodes);
+            try {
+                const data = await fetchAC(codeInput, sacInput);
+                setDataTable(data)
+            } catch (error) {
+                console.error("Error al obtener los datos:", error);
+            }
         } catch (error) {
             console.error("Error al obtener los datos:", error);
         }
-    }
+    };
+
 
     useEffect(() => {
         fetchDataStandar();
-        if (standarInput !== '' || yearInput !== '') {
-            fetchCode(standarInput)
-            fetchSAC();
+
+        handleRefresh()
+
+        if (yearInput === '') {
+            setDataTable([])
+        } else {
+            handleRefresh()
         }
-        fetchProcess()
-    }, [standarInput, codeInput, processInput, yearInput, statusInput]);
+    }, [standarInput, codeInput, processInput, yearInput, statusInput, sacInput]);
 
     return (
         <>
@@ -186,7 +201,7 @@ function TableSACView() {
                     switch (action) {
                         case 'new':
                             return (
-                                <ModalView openModal={openModal} closeModal={closeModal} isOpen={isOpen} componentReact={componet} title={"Registrar nueva SAC"} />
+                                <ModalView openModal={openModal} closeModal={closeModal} isOpen={isOpen} componentReact={componet} title={"Registrar AC"} sizeModal='w-1/2' sizeModalMax='w-1/2' />
                             );
                         case 'modify':
                             return (
@@ -196,10 +211,6 @@ function TableSACView() {
                             return (
                                 <ModalView openModal={openModal} closeModal={closeModal} isOpen={isOpen} componentReact={componet} title={"Eliminar SAC"} />
                             );
-                        case 'ac':
-                            return (
-                                <ModalView openModal={openModal} closeModal={closeModal} isOpen={isOpen} componentReact={componet} title={"Acciones correctivas"} sizeModal='w-1/2' sizeModalMax='w-full' />
-                            );
                         default:
                             return null;
                     }
@@ -207,7 +218,7 @@ function TableSACView() {
             }
             <div className="flex items-center justify-between">
                 <div className='flex'>
-                    <div className='m-2 -ml-2'>
+                    <div className='m-2'>
                         <span className='text-sm font-semibold' >Estándar</span>
                         <SearchSelectView
                             placeholder="Seleccione un estándar"
@@ -216,22 +227,23 @@ function TableSACView() {
                             valores={standarNames}
                         />
                     </div>
+
                     <div className='m-2'>
-                        <span className='text-sm font-semibold'>Auditoria</span>
+                        <span className='text-sm font-semibold' >Auditoria</span>
                         <SearchSelectView
-                            placeholder="Seleccione un código"
+                            placeholder="Seleccione una SAC"
                             select={codeInput}
                             setSelectValue={setCodeInput}
-                            valores={['Todos', ...codeAudit]}
+                            valores={codeAudit}
                         />
                     </div>
                     <div className='m-2'>
-                        <span className='text-sm font-semibold'>Proceso</span>
+                        <span className='text-sm font-semibold'>SAC</span>
                         <SearchSelectView
-                            placeholder="Seleccione un proceso"
-                            select={processInput}
-                            setSelectValue={setProcessInput}
-                            valores={['Todos', ...processName]}
+                            placeholder="Seleccione una SAC"
+                            select={sacInput}
+                            setSelectValue={setSacInput}
+                            valores={['Todos', ...sacArray]}
                         />
                     </div>
                     <div className='m-2'>
@@ -241,15 +253,6 @@ function TableSACView() {
                             select={yearInput}
                             setSelectValue={setYearInput}
                             valores={arrayYears}
-                        />
-                    </div>
-                    <div className='m-2'>
-                        <span className='text-sm font-semibold'>Estado</span>
-                        <SearchSelectView
-                            placeholder="Seleccione un estado"
-                            select={statusInput}
-                            setSelectValue={setStatusInput}
-                            valores={['Todos', 'Abierta', 'Cerrada']}
                         />
                     </div>
                 </div>
@@ -276,12 +279,7 @@ function TableSACView() {
                     <tr>
                         <th>
                             <div className="flex item-center justify-center">
-                                Estándar
-                            </div>
-                        </th>
-                        <th>
-                            <div className="flex item-center justify-center">
-                                Auditoría
+                                Auditoria
                             </div>
                         </th>
                         <th>
@@ -291,7 +289,12 @@ function TableSACView() {
                         </th>
                         <th>
                             <div className="flex item-center justify-center">
-                                Proceso
+                                Descripción
+                            </div>
+                        </th>
+                        <th>
+                            <div className="flex item-center justify-center">
+                                Responsable
                             </div>
                         </th>
                         <th>
@@ -299,60 +302,46 @@ function TableSACView() {
                                 Estado
                             </div>
                         </th>
-                        <th>
-                            <div className="flex item-center justify-center">
-                                Descripción
-                            </div>
-                        </th>
                         <th></th>
+                        <th>
+                        </th>
                     </tr>
                 </thead>
                 <tbody className="text-md text-black">
                     {dataTable.map((item, index) => (
                         <tr className={`border-t border-slate-400 ${index % 2 == 0 ? 'bg-slate-100' : ''}`} key={index}>
+
                             <td className="">
                                 <div className="flex item-center justify-center">
-                                    {item.standar_name}
-                                </div>
-                            </td>
-                            <td className="">
-                                <div className="flex item-center justify-center ">
                                     {item.audit_code}
                                 </div>
                             </td>
                             <td className="">
-                                <div className="flex item-center justify-center ">
+                                <div className="flex item-center justify-center">
                                     {item.sac_code}
                                 </div>
                             </td>
                             <td className="">
                                 <div className="flex item-center justify-center ">
-                                    {item.process_name}
+                                    {item.ac_description}
                                 </div>
                             </td>
 
                             <td className="">
                                 <div className="flex item-center justify-center ">
-                                    {item.sac_status === 'Abierta' ?
-                                        <Badge icon={StatusOnlineIcon} color={'teal'}>{item.sac_status}</Badge>
-                                        :
-                                        <Badge icon={CheckCircleIcon} color={'rose'}>{item.sac_status}</Badge>}
+                                    {item.ac_responsible}
                                 </div>
                             </td>
                             <td className="">
                                 <div className="flex item-center justify-center ">
-                                    {item.sac_description}                                </div>
+                                    {item.ac_status === 'Abierta' ?
+                                        <Badge icon={StatusOnlineIcon} color={'teal'}>{item.ac_status}</Badge>
+                                        :
+                                        <Badge icon={CheckCircleIcon} color={'rose'}>{item.ac_status}</Badge>}
+                                </div>
                             </td>
                             <td className="">
                                 <div className="flex item-center justify-center capitalize">
-                                    <button
-                                        onClick={() => handleAC(item.audit_code, item.sac_code)}
-                                        className={`p-1 m-1 rounded-lg bg-slate-700`}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="white" className="w-5 h-6">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                        </svg>
-                                    </button>
                                     <button
                                         onClick={() => handleModify({ item })}
                                         className='p-1 m-1 bg-slate-700 rounded-lg'>
@@ -377,4 +366,4 @@ function TableSACView() {
     )
 }
 
-export default TableSACView;
+export default TableACView;

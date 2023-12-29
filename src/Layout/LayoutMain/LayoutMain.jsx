@@ -1,6 +1,4 @@
 import React, { useContext, useState } from 'react'
-import Navbar from '../Navbar/Navbar'
-import { SGIContext } from '../../Context/SGIContext'
 import ManagerView from '../../View/TableManagers/ManagerView'
 import TableDocumentsView from '../../View/TableDocuments/TableDocumentsView'
 import TableObjetiveView from '../../View/TableObjetive/TableObjetiveView'
@@ -10,7 +8,8 @@ import DashboardGralView from '../Dashboards/DashboardGralView'
 import NavbarView from '../Navbar/NavbarView'
 
 function LayoutMain() {
-    const { selectedComponent } = useContext(SGIContext);
+    //const { selectedComponent } = useContext(SGIContext);
+    const [selectedComponent, setSelectedComponent] = useState('dashboard');
     const renderSelectedComponent = () => {
         switch (selectedComponent) {
             case 'dashboard':
@@ -22,7 +21,7 @@ function LayoutMain() {
             case 'objetive':
                 return <TableObjetiveView />
             case 'sac':
-                return <TableSacView/>
+                return <TableSacView />
             default:
                 return null;
         }
@@ -31,7 +30,7 @@ function LayoutMain() {
         <>
             <div className='grid grid-cols-7 w-screen h-screen fixed left-0 top-0 right-0'>
                 <div className='z-50 col-span-1'>
-                    <SidebarView />
+                    <SidebarView selectedComponent={selectedComponent} setSelectedComponent={setSelectedComponent} />
                 </div>
                 <div className='z-1 col-span-6 overflow-y-scroll bottom-0'>
                     <div className='z-20 sticky right-0 left-0 top-0'>

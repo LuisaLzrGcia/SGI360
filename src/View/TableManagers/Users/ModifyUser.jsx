@@ -71,16 +71,19 @@ const ModifyUser = ({ arrayProcesses, data = "", setDataUsers, closeModal, handl
       <div className="grid grid-cols-1 mt-3">
         <div>Nombre de usuario</div>
         <input type="text"
+          maxLength={55}
           value={usernameInput}
           onChange={(event) => setUsernameInput(event.target.value)}
           className="px-2 py-1 border rounded-md bg-gray-50" />
         <div>Nombre</div>
         <input
+          maxLength={195}
           value={firstNameInput}
           onChange={(event) => setFirstNameInput(event.target.value)}
           className="px-2 py-1 border rounded-md bg-gray-50" />
         <div>Apellido</div>
         <input
+          maxLength={195}
           value={lastNameInput}
           onChange={(event) => setLastNameInput(event.target.value)}
           className="px-2 py-1 border rounded-md bg-gray-50" />
@@ -99,17 +102,20 @@ const ModifyUser = ({ arrayProcesses, data = "", setDataUsers, closeModal, handl
         />
         <div>Puesto</div>
         <input
+          maxLength={95}
           value={jobTitleInput}
           onChange={(event) => setJobTitleInput(event.target.value)}
           className="px-2 py-1 border rounded-md bg-gray-50" />
         <div>Contraseña</div>
         <input
+          maxLength={55}
           value={passwordInput}
           onChangeCapture={() => setSamePassword(false)}
           onChange={(event) => setPasswordInput(event.target.value)}
           className="px-2 py-1 border rounded-md bg-gray-50" />
         <div>Confirmar contraseña</div>
         <input
+          maxLength={55}
           value={confirmPasswordInput}
           onChangeCapture={() => setSamePassword(false)}
           onChange={(event) => setConfirmPasswordInput(event.target.value)}

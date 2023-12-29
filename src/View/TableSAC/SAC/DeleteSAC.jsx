@@ -1,41 +1,20 @@
 import React, { useContext, useEffect, useState } from "react";
-const API_SGI360 = import.meta.env.VITE_API_DATABASE;
+import deleteAPI from '../../../Hooks/deleteAPI';
+const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
 
 function DeleteSAC({ item, handleRefresh = () => { }, closeModal, }) {
-  console.log(item)
   const [standarInput, setStandarInput] = useState(item.standar_name);
   const [codeInput, setCodeInput] = useState(item.code);
   const [processInput, setProcessInput] = useState(item.process_name)
   const [statusInput, setStatusInput] = useState(item.sac_status)
+  const [codeSAC, setCodeSAC] = useState(item.sac_code)
   const [descriptionInput, setDescriptionInput] = useState(item.sac_description);
 
   function saveData() {
-    const URL = `${API_SGI360}/admin/SAC/deleteSAC.php`;
-    const data = {
-      id: item.id_sac_pk,
-    };
+    const URL = `${API_SGI360_NODEJS}/sac/${item.id_sac_pk}`;
 
-    fetch(URL, {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-      .then(response => response.json())
-      .then(result => {
-        if (result.status === 'Successfully') {
-          alert("Datos eliminados");
-          handleRefresh()
-          closeModal();
-        } else {
-          console.log('Error al insertar');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Error al intentar guardar los datos');
-      });
+    deleteAPI(URL, closeModal, handleRefresh)
+
   }
 
   return (
@@ -76,6 +55,12 @@ function DeleteSAC({ item, handleRefresh = () => { }, closeModal, }) {
           onChange={(event) => setStatusInput(event.target.value)}
           className="px-2 py-1 border rounded-md bg-gray-50"
         />
+        <div>Código</div>
+        <input type="text"
+          className="px-2 py-1 border rounded-md bg-gray-50"
+          value={codeSAC}
+          disabled={true}
+          onChange={(event) => setCodeInput(event.target.value)} />
         <div>Descripción</div>
         <textarea
           cols="5" rows=""

@@ -1,4 +1,4 @@
-import React, {useState } from "react";
+import React, { useState } from "react";
 const API_SGI360_NODEJS = import.meta.env.VITE_API_SGI360_DATABASE;
 import putAPI from "../../../Hooks/putAPI"
 
@@ -24,6 +24,7 @@ function ModifyStandar({ item, handleRefresh = () => { }, closeModal }) {
       <div className="grid grid-cols-1 mt-3">
         <div>Nombre del estándar</div>
         <input
+          maxLength={95}
           type="text"
           value={nameInput}
           onChange={(event) => setNameInput(event.target.value)}
@@ -31,6 +32,7 @@ function ModifyStandar({ item, handleRefresh = () => { }, closeModal }) {
         />
         <div>Descripción</div>
         <input
+          maxLength={395}
           value={descriptionInput}
           onChange={(event) => setDescriptionInput(event.target.value)}
           className="px-2 py-1 border rounded-md bg-gray-50"

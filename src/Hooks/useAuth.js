@@ -14,6 +14,7 @@ function useAuth() {
     sessionStorage.setItem("process_name", data.process_name);
     sessionStorage.setItem("type", data.type);
     sessionStorage.setItem("user_name", data.user_name);
+    sessionStorage.setItem("power_bi", data.power_bi);
     setIsAuth(true);
   };
 
